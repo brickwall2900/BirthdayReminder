@@ -47,7 +47,6 @@ public class BirthdayNotifyGui extends JDialog {
         setSize(SIZE);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setVisible(true);
     }
 
     private void buildContentPane(BirthdayObject object) {
