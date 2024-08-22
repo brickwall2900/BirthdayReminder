@@ -1,6 +1,7 @@
 package com.github.brickwall2900.birthdays.gui;
 
 import com.github.brickwall2900.birthdays.BirthdayObject;
+import com.github.brickwall2900.birthdays.BirthdaysManager;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -48,7 +49,8 @@ public class BirthdayNotifyGui extends JDialog {
 
     private void buildContentPane(BirthdayObject object) {
         String labelContent = text("notify.content",
-                object.name, 
+                object.name,
+                BirthdaysManager.getAgeInDays(object),
                 object.customMessage != null
                         ? object.customMessage
                         : MESSAGES[(int) (Math.random() * MESSAGES.length)]);

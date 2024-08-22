@@ -30,6 +30,10 @@ public class BirthdaysManager {
         return BirthdaysConfig.BIRTHDAY_LIST.toArray(new BirthdayObject[0]);
     }
 
+    public static int getAgeInDays(BirthdayObject object) {
+        return LocalDate.now().minusYears(object.date.getYear()).getYear();
+    }
+
     public static boolean isMonthAndDayMatching(LocalDate date, LocalDate today) {
         return date.getMonth() == today.getMonth() && date.getDayOfMonth() == today.getDayOfMonth();
     }

@@ -7,7 +7,7 @@
       "Greet them a happy birthday!"
   ],
   "notify.title": "Today is %s's birthday!!!",
-  "notify.content": "Today is %s's birthday! %s",
+  "notify.content": "Today is %s's birthday! They are %d years old! %s",
 
   "notify.before.caption": "I just want to let you know...",
   "notify.before.text": "Tomorrow is %s's birthday!",
