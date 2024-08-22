@@ -16,18 +16,28 @@ public class Main {
     public static void main(String[] args) throws IOException {
         FlatLightLaf.setup();
 
-        BirthdayEditorGui editorGui = new BirthdayEditorGui(BirthdaysManager.getAllBirthdays());
-        editorGui.setVisible(true);
-
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            try {
-                BirthdaysConfig.BIRTHDAY_LIST.clear();
-                BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
-                BirthdaysConfig.save();
-            } catch (Exception e) {
-                e.printStackTrace();
+        boolean edit = false;
+        for (String s : args) {
+            if (s.equals("-edit")) {
+                edit = true;
+                break;
             }
-        }));
+        }
+
+        if (edit) {
+            BirthdayEditorGui editorGui = new BirthdayEditorGui(BirthdaysManager.getAllBirthdays());
+            editorGui.setVisible(true);
+
+            Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+                try {
+                    BirthdaysConfig.BIRTHDAY_LIST.clear();
+                    BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
+                    BirthdaysConfig.save();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }));
+        }
 
         BirthdayObject[] oneDayBefore = BirthdaysManager.getBirthdaysOffset(-1);
         BirthdayObject[] birthdaysToday = BirthdaysManager.getBirthdaysToday();
