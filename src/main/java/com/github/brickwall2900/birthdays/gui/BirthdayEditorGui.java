@@ -45,7 +45,7 @@ public class BirthdayEditorGui extends JFrame {
     private void buildContentPane() {
         JPanel contentPane = column(4,
                 cell(headerLabel = new JLabel(text("editor.header"))),
-                cell(birthdayList = new JList<>()).weightBy(1),
+                cell(birthdayScrollPane = new JScrollPane(birthdayList = new JList<>())).weightBy(1),
                 row(4,
                         cell(addButton = new JButton(text("dialog.add"))),
                         cell(removeButton = new JButton(text("dialog.remove"))),
@@ -108,6 +108,7 @@ public class BirthdayEditorGui extends JFrame {
     }
 
     public JLabel headerLabel;
+    public JScrollPane birthdayScrollPane;
     public JList<BirthdayObject> birthdayList;
     public JButton addButton, removeButton, editButton, closeButton;
 }
