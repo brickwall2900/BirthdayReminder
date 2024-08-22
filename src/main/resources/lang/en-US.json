@@ -1,0 +1,28 @@
+{
+  "messages": [
+      "Wish them a good day!",
+      "Celebrate them!",
+      "Wish them well!",
+      "Congratulate them!",
+      "Greet them a happy birthday!"
+  ],
+  "notify.title": "Today is %s's birthday!!!",
+  "notify.content": "Today is %s's birthday! %s",
+
+  "notify.before.caption": "I just want to let you know...",
+  "notify.before.text": "Tomorrow is %s's birthday!",
+
+  "editor.title": "Birthday Reminder Editor",
+  "editor.header": "Double click a person's name to edit their birthday!",
+
+  "editor.dialog.title": "Edit someone's birthday...",
+  "editor.dialog.fields.name": "Name: ",
+  "editor.dialog.fields.date": "Date: ",
+  "editor.dialog.fields.enabled": "Enabled: ",
+  "editor.dialog.fields.customMessage": "Custom Message: ",
+
+  "dialog.add": "Add",
+  "dialog.remove": "Remove",
+  "dialog.edit": "Edit",
+  "dialog.close": "Close"
+}

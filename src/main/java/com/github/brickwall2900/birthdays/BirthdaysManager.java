@@ -14,12 +14,20 @@ public class BirthdaysManager {
     }
 
     public static BirthdayObject[] getBirthdaysToday() {
+        return getBirthdaysOffset(0);
+    }
+
+    public static BirthdayObject[] getBirthdaysOffset(int days) {
         List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
-        LocalDate today = LocalDate.now();
+        LocalDate today = LocalDate.now().plusDays(days);
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
                 .filter(obj -> isMonthAndDayMatching(obj.date, today))
                 .toList();
         return birthdaysToday.toArray(new BirthdayObject[0]);
+    }
+
+    public static BirthdayObject[] getAllBirthdays() {
+        return BirthdaysConfig.BIRTHDAY_LIST.toArray(new BirthdayObject[0]);
     }
 
     public static boolean isMonthAndDayMatching(LocalDate date, LocalDate today) {

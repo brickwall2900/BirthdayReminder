@@ -9,10 +9,11 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
+import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayEditDialogBox extends JDialog {
-    public static final String TITLE = "Edit someone's birthday...";
+    public static final String TITLE = text("editor.dialog.title");
     public static final Dimension SIZE = new Dimension(400, 200);
     public static final int BORDER = 8;
 
@@ -41,21 +42,21 @@ public class BirthdayEditDialogBox extends JDialog {
     private void buildContentPane() {
         JPanel contentPane = column(4,
                 row(4,
-                        cell(nameLabel = new JLabel("Name: ")),
+                        cell(nameLabel = new JLabel(text("editor.dialog.fields.name"))),
                         cell(nameField = new JTextField()).weightBy(1)),
                 row(4,
-                        cell(dateLabel = new JLabel("Date: ")),
+                        cell(dateLabel = new JLabel(text("editor.dialog.fields.date"))),
                         cell(datePicker = new DatePicker()).weightBy(1)),
                 row(4,
-                        cell(enabledLabel = new JLabel("Enabled: ")),
+                        cell(enabledLabel = new JLabel(text("editor.dialog.fields.enabled"))),
                         cell(enabledCheckBox = new JCheckBox())),
                 row(4,
-                        cell(customMessageLabel = new JLabel("Custom Message: ")),
+                        cell(customMessageLabel = new JLabel(text("editor.dialog.fields.customMessage"))),
                         cell(customMessageField = new JTextField()).weightBy(1)),
                 glue(),
                 row(4,
                         glue(),
-                        cell(closeButton = new JButton("Close")))).getComponent();
+                        cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
         contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
         setContentPane(contentPane);
     }
