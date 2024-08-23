@@ -6,7 +6,6 @@ import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 

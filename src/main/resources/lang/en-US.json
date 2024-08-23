@@ -1,10 +1,13 @@
 {
   "messages": [
-      "Wish them a good day!",
-      "Celebrate them!",
-      "Wish them well!",
-      "Congratulate them!",
-      "Greet them a happy birthday!"
+    "Wish them a good day!",
+    "Celebrate them!",
+    "Wish them well!",
+    "Congratulate them!",
+    "Greet them a happy birthday!",
+    "Send some good vibes to them!",
+    "Let them know you're thinking about them!",
+    "Go cheer them up!"
   ],
   "notify.title": "Today is %s's birthday!!!",
   "notify.content": "Today is %s's birthday! They are %d years old! %s",
