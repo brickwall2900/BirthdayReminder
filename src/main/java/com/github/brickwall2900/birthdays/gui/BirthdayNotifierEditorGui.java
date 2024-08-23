@@ -7,6 +7,7 @@ import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.Locale;
 
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
@@ -93,7 +94,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         @Override
         public boolean accept(File f) {
-            return f.isDirectory() || f.getName().endsWith(".wav");
+            return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".wav");
         }
 
         @Override
