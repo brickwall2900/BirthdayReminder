@@ -61,7 +61,6 @@ public class Main {
 
     public static void save() {
         try {
-            System.out.println("saving!");
             BirthdaysConfig.BIRTHDAY_LIST.clear();
             BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
             BirthdaysConfig.save();

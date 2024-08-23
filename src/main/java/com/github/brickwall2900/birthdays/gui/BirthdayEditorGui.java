@@ -118,7 +118,7 @@ public class BirthdayEditorGui extends JFrame {
 
     public BirthdayObject[] getBirthdays() {
         DefaultListModel<BirthdayObject> model = (DefaultListModel<BirthdayObject>) birthdayList.getModel();
-        Object[] o = model.toArray();
+        Object[] o = model.toArray(); // will be BirthdayObject[] trust me
         BirthdayObject[] value = new BirthdayObject[o.length];
         System.arraycopy(o, 0, value,0, o.length);
         return value;

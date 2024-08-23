@@ -1,8 +1,8 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.BirthdaysManager;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
-import com.github.brickwall2900.birthdays.BirthdaysManager;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -37,7 +37,7 @@ public class BirthdayNotifyGui extends JDialog {
         }
     }
 
-    private BirthdayObject birthday;
+    private final BirthdayObject birthday;
     private Clip clip;
 
     public BirthdayNotifyGui(BirthdayObject object) {

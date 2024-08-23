@@ -4,7 +4,6 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
@@ -36,7 +35,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         this(owner);
 
         daysBeforeReminderSpinner.setValue(config.daysBeforeReminder);
-        birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath.toString() : null);
+        birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath : null);
     }
 
     private void buildContentPane() {

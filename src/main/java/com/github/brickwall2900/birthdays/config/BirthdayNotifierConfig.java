@@ -1,10 +1,7 @@
 package com.github.brickwall2900.birthdays.config;
 
-import com.github.brickwall2900.birthdays.adapters.PathAdapter;
-import com.github.brickwall2900.birthdays.adapters.PathTypeAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
 import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
@@ -13,14 +10,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Objects;
 
 public class BirthdayNotifierConfig {
     public static final Path GLOBAL_PATH = Paths.get(System.getProperty("user.home"), "BirthdayReminder");
     public static final Path NOTIFIER_CONFIG_PATH = GLOBAL_PATH.resolve("notifier.json");
     public static Config globalConfig = new Config();
-    public static boolean loaded = false;
+    public static boolean loaded;
 
     static {
         if (!Files.exists(GLOBAL_PATH)) {
