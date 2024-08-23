@@ -27,6 +27,7 @@
   "notify.editor.dialog.title": "Notifier Editor",
   "notify.editor.dialog.daysBeforeReminder": "Days before reminder: ",
   "notify.editor.dialog.birthdaySoundLabel": "Sound path: ",
+  "notify.editor.dialog.birthdaySound.fileType": "WAV File (.wav)",
 
   "dialog.add": "Add",
   "dialog.remove": "Remove",

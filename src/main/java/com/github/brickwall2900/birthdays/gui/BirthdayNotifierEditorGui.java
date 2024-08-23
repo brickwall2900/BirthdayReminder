@@ -98,7 +98,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         @Override
         public String getDescription() {
-            return "WAV File (.wav)";
+            return text("notify.editor.dialog.birthdaySound.fileType");
         }
     }
 }
