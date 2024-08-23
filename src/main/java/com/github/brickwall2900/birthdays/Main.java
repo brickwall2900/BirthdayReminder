@@ -5,15 +5,21 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
-import com.github.brickwall2900.birthdays.gui.BirthdayNotifyGui;
 
+import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
+import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class Main {
@@ -40,7 +46,7 @@ public class Main {
 
     public static void buildTrayIcon() {
         SystemTray systemTray = SystemTray.getSystemTray();
-        trayIcon = new TrayIcon(BirthdayNotifyGui.IMAGE_ICON);
+        trayIcon = new TrayIcon(IMAGE_ICON);
         trayIcon.setImageAutoSize(true);
 
         PopupMenu popupMenu = new PopupMenu();
@@ -85,19 +91,76 @@ public class Main {
         BirthdayObject[] allBirthdays = BirthdaysManager.getAllBirthdays();
         // notify them
         for (BirthdayObject birthday : birthdaysToday) {
-            BirthdayNotifyGui notifyGui = new BirthdayNotifyGui(birthday);
-            notifyGui.open();
+            notifyBirthday(birthday);
         }
 
         // remind them
         for (BirthdayObject birthday : allBirthdays) {
             if (BirthdaysManager.shouldRemind(birthday) && !BirthdaysManager.isBirthdayToday(birthday)) {
-                notifyBirthday(birthday);
+                remindBirthday(birthday);
             }
         }
     }
 
+    public static final Image IMAGE_ICON;
+    public static final ImageIcon ICON;
+
+    public static final String[] MESSAGES = Objects.requireNonNull(getArray("messages"), "Messages are missing??");
+
+    static {
+        try {
+            IMAGE_ICON = ImageIO.read(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.png")));
+            ICON = new ImageIcon(IMAGE_ICON.getScaledInstance(32, 32, Image.SCALE_DEFAULT));
+        } catch (IOException | NullPointerException e) {
+            throw new RuntimeException("Cannot read birthday icon!");
+        }
+    }
+
     public static void notifyBirthday(BirthdayObject birthday) {
+        Clip clip = playSound(birthday);
+        String labelContent = text("notify.content",
+                birthday.name,
+                BirthdaysManager.getAgeInDays(birthday),
+                birthday.customMessage != null
+                        ? birthday.customMessage
+                        : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
+        String title = text("notify.title", birthday.name);
+        JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
+        JDialog dialog = optionPane.createDialog(title);
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setIconImage(IMAGE_ICON);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+        dialog.requestFocus();
+        // wait for user
+        if (clip != null) {
+            clip.stop();
+            clip.close();
+        }
+    }
+
+    private static Clip playSound(BirthdayObject birthday) {
+        String soundLocation = birthday.override != null
+                ? birthday.override.birthdaySoundPath
+                : BirthdayNotifierConfig.globalConfig.birthdaySoundPath;
+
+        if (soundLocation != null && !soundLocation.isBlank()) {
+            Path soundPath = Paths.get(soundLocation);
+            try {
+                DataLine.Info info = new DataLine.Info(Clip.class, null);
+                Clip clip = (Clip) AudioSystem.getLine(info);
+                clip.open(AudioSystem.getAudioInputStream(soundPath.toFile()));
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+                return clip;
+            } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+                System.err.println("Cannot open a line for " + soundLocation);
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
+    public static void remindBirthday(BirthdayObject birthday) {
         if (!birthday.enabled) return;
 
         long daysBeforeBirthday = BirthdaysManager.getDaysBeforeBirthday(birthday);
