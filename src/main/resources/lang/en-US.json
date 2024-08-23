@@ -40,6 +40,7 @@
 
   "errors.title": "ERROR!!",
   "errors.cannotSave": "Unable to save birthday list or configuration! (%s)",
+  "errors.instanceAlreadyRunning": "Another instance is already running.",
 
   "popup.open": "Open",
   "popup.exit": "Exit"

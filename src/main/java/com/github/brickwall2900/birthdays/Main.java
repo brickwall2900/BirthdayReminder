@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays;
 
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
@@ -23,23 +24,47 @@ import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class Main {
-    public static void main(String[] args)  {
+    private static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
+
+    public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::swingContext);
     }
 
     private static BirthdayListEditorGui editorGui;
     private static TrayIcon trayIcon;
+    private static InstanceLock lock;
+    private static Timer lockTimer;
+
     private static void swingContext() {
-        FlatLightLaf.setup();
+        if (Boolean.getBoolean("dark.mode")) {
+            FlatDarkLaf.setup();
+        } else {
+            FlatLightLaf.setup();
+        }
+
+        lock = new InstanceLock(UNIQUE_APP_ID);
+        if (!lock.lock()) {
+            // maybe we use another title other than editor.title?
+            JOptionPane.showMessageDialog(null, text("errors.instanceAlreadyRunning"), text("editor.title"), JOptionPane.ERROR_MESSAGE);
+            System.exit(0);
+        }
 
         editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
-        Runtime.getRuntime().addShutdownHook(new Thread(Main::save));
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            save();
+            lock.unlock();
+        }));
 
         buildTrayIcon();
 
         Timer updater = new Timer(1000, Main::tickUpdate);
         updater.setRepeats(true);
         updater.start();
+
+        Timer lockTheDamnInstance = new Timer(500, Main::tryLockingTheDamnInstance);
+        lockTheDamnInstance.setRepeats(true);
+        lockTheDamnInstance.start();
+        lockTimer = lockTheDamnInstance;
 
         performChecks();
     }
@@ -78,12 +103,20 @@ public class Main {
     }
 
     private static LocalDate today = LocalDate.now();
+
     public static void tickUpdate(ActionEvent e) {
         LocalDate today = LocalDate.now();
         if (!Main.today.equals(today)) { // day has changed, go update lol
             Main.today = today;
             performChecks();
         }
+    }
+
+    private static void tryLockingTheDamnInstance(ActionEvent e) {
+        if (lock.isLocked()) {
+            lock.lock();
+        }
+        lockTimer.stop();
     }
 
     public static void performChecks() {
