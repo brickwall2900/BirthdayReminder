@@ -4,7 +4,7 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
-import com.github.brickwall2900.birthdays.gui.BirthdayEditorGui;
+import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
 import com.github.brickwall2900.birthdays.gui.BirthdayNotifyGui;
 
 import javax.swing.*;
@@ -21,12 +21,12 @@ public class Main {
         SwingUtilities.invokeLater(Main::swingContext);
     }
 
-    private static BirthdayEditorGui editorGui;
+    private static BirthdayListEditorGui editorGui;
     private static TrayIcon trayIcon;
     private static void swingContext() {
         FlatLightLaf.setup();
 
-        editorGui = new BirthdayEditorGui(BirthdaysManager.getAllBirthdays());
+        editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
         Runtime.getRuntime().addShutdownHook(new Thread(Main::save));
 
         buildTrayIcon();
