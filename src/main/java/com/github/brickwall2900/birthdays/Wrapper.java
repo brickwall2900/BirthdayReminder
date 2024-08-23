@@ -6,7 +6,6 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiConsumer;
 import java.util.function.BiFunction;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class Wrapper {
     public static Runnable wrap(Runnable runnable) {
@@ -39,6 +38,10 @@ public class Wrapper {
 
     public static <T> Consumer<Object> wrapIndirect(Consumer<T> callback, T object) {
         return o -> callback.accept(object);
+    }
+
+    public static <T> Consumer<Object> wrapConsumerToVoid(Runnable runnable) {
+        return o -> runnable.run();
     }
 
     public static <V> Runnable wrapReturnable(Callable<V> callable, AtomicReference<V> reference) {

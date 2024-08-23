@@ -1,6 +1,7 @@
 package com.github.brickwall2900.birthdays.gui;
 
-import com.github.brickwall2900.birthdays.BirthdayObject;
+import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import org.httprpc.sierra.DatePicker;
 
 import javax.swing.*;
@@ -13,9 +14,10 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayEditDialogBox extends JDialog {
-    public static final String TITLE = text("editor.dialog.title");
     public static final Dimension SIZE = new Dimension(400, 200);
     public static final int BORDER = 8;
+
+    private BirthdayObject birthday;
 
     public BirthdayEditDialogBox(BirthdayEditorGui parent) {
         super(parent);
@@ -23,8 +25,13 @@ public class BirthdayEditDialogBox extends JDialog {
         buildContentPane();
         enabledCheckBox.setSelected(true);
         closeButton.addActionListener(this::onCloseButtonPressed);
+        overrideConfigButton.addActionListener(this::onOverrideConfigButtonPressed);
+        removeOverrideConfigButton.addActionListener(this::onRemoveOverrideConfigButtonPressed);
+        removeOverrideConfigButton.setEnabled(false);
 
-        setTitle(TITLE);
+        this.birthday = new BirthdayObject();
+
+        setTitle(text("editor.dialog.title", "???"));
         setSize(SIZE);
         setLocationRelativeTo(parent);
         setModalityType(ModalityType.APPLICATION_MODAL);
@@ -32,11 +39,15 @@ public class BirthdayEditDialogBox extends JDialog {
 
     public BirthdayEditDialogBox(BirthdayEditorGui parent, BirthdayObject birthday) {
         this(parent);
+        this.birthday = birthday;
 
+        setTitle(text("editor.dialog.title", birthday.name));
         nameField.setText(birthday.name);
         datePicker.setDate(birthday.date);
         enabledCheckBox.setSelected(birthday.enabled);
         customMessageField.setText(birthday.customMessage);
+
+        removeOverrideConfigButton.setEnabled(birthday.override != null);
     }
 
     private void buildContentPane() {
@@ -53,6 +64,10 @@ public class BirthdayEditDialogBox extends JDialog {
                 row(4,
                         cell(customMessageLabel = new JLabel(text("editor.dialog.fields.customMessage"))),
                         cell(customMessageField = new JTextField()).weightBy(1)),
+                row(4,
+                        cell(overrideConfigLabel = new JLabel(text("editor.dialog.fields.override"))),
+                        cell(overrideConfigButton = new JButton(text("dialog.edit"))).weightBy(1),
+                        cell(removeOverrideConfigButton = new JButton(text("dialog.remove")))),
                 glue(),
                 row(4,
                         glue(),
@@ -65,6 +80,21 @@ public class BirthdayEditDialogBox extends JDialog {
         dispose();
     }
 
+    private void onOverrideConfigButtonPressed(ActionEvent e) {
+        BirthdayNotifierConfig.Config defaultConfig = new BirthdayNotifierConfig.Config();
+        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, birthday.override != null ? birthday.override : defaultConfig);
+        notifierEditorGui.setVisible(true);
+        // wait for user
+        BirthdayNotifierConfig.Config modifiedConfig = notifierEditorGui.toConfig();
+        birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
+        removeOverrideConfigButton.setEnabled(birthday.override != null);
+    }
+
+    private void onRemoveOverrideConfigButtonPressed(ActionEvent e) {
+        birthday.override = null;
+        removeOverrideConfigButton.setEnabled(false);
+    }
+
     public BirthdayObject toBirthday() {
         String name = nameField.getText();
         if (name.isBlank()) return null;
@@ -72,15 +102,16 @@ public class BirthdayEditDialogBox extends JDialog {
         boolean enabled = enabledCheckBox.isSelected();
         String customMessage = customMessageField.getText();
 
-        return new BirthdayObject(name, enabled, date, !customMessage.isBlank() ? customMessage : null);
+        return birthday = new BirthdayObject(name, enabled, date, !customMessage.isBlank() ? customMessage : null, birthday.override);
     }
 
-    public JLabel nameLabel, dateLabel, enabledLabel, customMessageLabel;
+    public JLabel nameLabel, dateLabel, enabledLabel, customMessageLabel, overrideConfigLabel;
 
     public JTextField nameField;
     public DatePicker datePicker;
     public JCheckBox enabledCheckBox;
     public JTextField customMessageField;
+    public JButton overrideConfigButton, removeOverrideConfigButton;
 
     public JButton closeButton;
 }

@@ -1,7 +1,12 @@
-package com.github.brickwall2900.birthdays;
+package com.github.brickwall2900.birthdays.config.object;
 
+import com.github.brickwall2900.birthdays.adapters.LocalDateAdapter;
+import com.github.brickwall2900.birthdays.adapters.PathAdapter;
+import com.github.brickwall2900.birthdays.adapters.PathTypeAdapter;
+import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
@@ -16,12 +21,16 @@ import java.util.Arrays;
 import java.util.List;
 
 public class BirthdaysConfig {
-    public static final Path PATH = Paths.get(System.getProperty("user.home"), "birthdays.json");
+    public static final Path PATH = BirthdayNotifierConfig.GLOBAL_PATH.resolve("birthdays.json");
     public static final List<BirthdayObject> BIRTHDAY_LIST = new ArrayList<>();
     private static boolean loaded;
 
     public static void load() throws IOException {
         if (!loaded) {
+            if (!Files.exists(PATH)) {
+                Files.createFile(PATH);
+                Files.writeString(PATH, new JsonArray().toString());
+            }
             GsonBuilder gsonBuilder = new GsonBuilder();
             gsonBuilder
                     .setPrettyPrinting()
@@ -42,9 +51,8 @@ public class BirthdaysConfig {
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
         Gson gson = gsonBuilder.create();
-        try (BufferedWriter writer = Files.newBufferedWriter(PATH)) {
-            gson.toJson(BIRTHDAY_LIST.toArray(new BirthdayObject[0]), writer);
-        }
+        String output = gson.toJson(BIRTHDAY_LIST.toArray(new BirthdayObject[0]));
+        Files.writeString(PATH, output); // prevent file cutoffs
     }
 
 }

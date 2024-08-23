@@ -1,17 +1,16 @@
 package com.github.brickwall2900.birthdays.gui;
 
-import com.github.brickwall2900.birthdays.BirthdayObject;
+import com.github.brickwall2900.birthdays.Main;
+import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 
 import javax.swing.*;
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.function.Consumer;
 
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
@@ -31,7 +30,15 @@ public class BirthdayEditorGui extends JFrame {
         addButton.addActionListener(this::onAddButtonPressed);
         removeButton.addActionListener(this::onRemoveButtonPressed);
         editButton.addActionListener(this::onEditButtonPressed);
+        configButton.addActionListener(this::onConfigButtonPressed);
         birthdayList.addListSelectionListener(this::onListSelectionChanged);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                Main.save();
+            }
+        });
 
         removeButton.setEnabled(false);
         editButton.setEnabled(false);
@@ -39,7 +46,7 @@ public class BirthdayEditorGui extends JFrame {
         setTitle(TITLE);
         setSize(SIZE);
         setLocationRelativeTo(null);
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
     }
 
     private void buildContentPane() {
@@ -50,6 +57,7 @@ public class BirthdayEditorGui extends JFrame {
                         cell(addButton = new JButton(text("dialog.add"))),
                         cell(removeButton = new JButton(text("dialog.remove"))),
                         cell(editButton = new JButton(text("dialog.edit"))),
+                        cell(configButton = new JButton(text("dialog.notify.config"))),
                         glue(),
                         cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
         contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
@@ -57,7 +65,9 @@ public class BirthdayEditorGui extends JFrame {
     }
 
     private void onCloseButtonPressed(ActionEvent e) {
-        System.exit(0);
+        // simulate closing a window
+        // closing events won't work without this
+        dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
     private void onAddButtonPressed(ActionEvent e) {
@@ -93,6 +103,13 @@ public class BirthdayEditorGui extends JFrame {
         }
     }
 
+    private void onConfigButtonPressed(ActionEvent e) {
+        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, BirthdayNotifierConfig.globalConfig);
+        notifierEditorGui.setVisible(true);
+        // wait for user
+        BirthdayNotifierConfig.globalConfig = notifierEditorGui.toConfig();
+    }
+
     private void onListSelectionChanged(ListSelectionEvent e) {
         BirthdayObject selected = birthdayList.getSelectedValue();
         removeButton.setEnabled(selected != null);
@@ -110,5 +127,5 @@ public class BirthdayEditorGui extends JFrame {
     public JLabel headerLabel;
     public JScrollPane birthdayScrollPane;
     public JList<BirthdayObject> birthdayList;
-    public JButton addButton, removeButton, editButton, closeButton;
+    public JButton addButton, removeButton, editButton, configButton, closeButton;
 }

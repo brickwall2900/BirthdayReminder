@@ -10,19 +10,33 @@
   "notify.content": "Today is %s's birthday! They are %d years old! %s",
 
   "notify.before.caption": "I just want to let you know...",
-  "notify.before.text": "Tomorrow is %s's birthday!",
+  "notify.before.text.tomorrow": "Tomorrow is %s's birthday!",
+  "notify.before.text.more": "%s's birthday will be in %d days!",
 
   "editor.title": "Birthday Reminder Editor",
-  "editor.header": "Double click a person's name to edit their birthday!",
+  "editor.header": "Add, remove, or edit people's birthday!",
+  "editor.object": "%s, at %s; %d days left",
 
-  "editor.dialog.title": "Edit someone's birthday...",
+  "editor.dialog.title": "Edit %s's birthday...",
   "editor.dialog.fields.name": "Name: ",
   "editor.dialog.fields.date": "Date: ",
   "editor.dialog.fields.enabled": "Enabled: ",
   "editor.dialog.fields.customMessage": "Custom Message: ",
+  "editor.dialog.fields.override": "Override Config: ",
+
+  "notify.editor.dialog.title": "Notifier Editor",
+  "notify.editor.dialog.daysBeforeReminder": "Days before reminder: ",
+  "notify.editor.dialog.birthdaySoundLabel": "Sound path: ",
 
   "dialog.add": "Add",
   "dialog.remove": "Remove",
   "dialog.edit": "Edit",
-  "dialog.close": "Close"
+  "dialog.notify.config": "Config",
+  "dialog.close": "Close",
+
+  "errors.title": "ERROR!!",
+  "errors.cannotSave": "Unable to save birthday list or configuration! (%s)",
+
+  "popup.open": "Open",
+  "popup.exit": "Exit"
 }

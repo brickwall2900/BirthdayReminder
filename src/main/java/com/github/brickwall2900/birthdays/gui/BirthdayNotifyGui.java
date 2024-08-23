@@ -1,13 +1,19 @@
 package com.github.brickwall2900.birthdays.gui;
 
-import com.github.brickwall2900.birthdays.BirthdayObject;
+import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.BirthdaysManager;
 
 import javax.imageio.ImageIO;
+import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.IOException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Objects;
 
 import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
@@ -31,11 +37,26 @@ public class BirthdayNotifyGui extends JDialog {
         }
     }
 
+    private BirthdayObject birthday;
+    private Clip clip;
+
     public BirthdayNotifyGui(BirthdayObject object) {
+        this.birthday = object;
         buildContentPane(object);
 
         label.setIcon(ICON);
         closeButton.addActionListener(this::onCloseButtonPressed);
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                onClosed();
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                onClosed();
+            }
+        });
 
         String title = text("notify.title", object.name);
         setTitle(title);
@@ -66,6 +87,37 @@ public class BirthdayNotifyGui extends JDialog {
 
     private void onCloseButtonPressed(ActionEvent e) {
         dispose();
+    }
+
+    private void onClosed() {
+        if (clip != null) {
+            clip.stop();
+            clip.close();
+        }
+    }
+
+    public void open() {
+        playSound();
+        setVisible(true);
+    }
+
+    private void playSound() {
+        String soundLocation = birthday.override != null
+                ? birthday.override.birthdaySoundPath
+                : BirthdayNotifierConfig.globalConfig.birthdaySoundPath;
+
+        if (soundLocation != null && !soundLocation.isBlank()) {
+            Path soundPath = Paths.get(soundLocation);
+            try {
+                DataLine.Info info = new DataLine.Info(Clip.class, null);
+                clip = (Clip) AudioSystem.getLine(info);
+                clip.open(AudioSystem.getAudioInputStream(soundPath.toFile()));
+                clip.loop(Clip.LOOP_CONTINUOUSLY);
+            } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
+                System.err.println("Cannot open a line for " + soundLocation);
+                e.printStackTrace();
+            }
+        }
     }
 
     public JLabel label;

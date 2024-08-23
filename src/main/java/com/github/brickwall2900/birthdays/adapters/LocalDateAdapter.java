@@ -1,4 +1,4 @@
-package com.github.brickwall2900.birthdays;
+package com.github.brickwall2900.birthdays.adapters;
 
 import com.google.gson.JsonDeserializer;
 import com.google.gson.JsonSerializer;
