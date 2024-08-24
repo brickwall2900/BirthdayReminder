@@ -44,8 +44,7 @@ public class Main {
 
         lock = new InstanceLock(UNIQUE_APP_ID);
         if (!lock.lock()) {
-            // maybe we use another title other than editor.title?
-            JOptionPane.showMessageDialog(null, text("errors.instanceAlreadyRunning"), text("editor.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, text("errors.instanceAlreadyRunning"), text("trayIcon.title"), JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
 
@@ -73,6 +72,7 @@ public class Main {
         SystemTray systemTray = SystemTray.getSystemTray();
         trayIcon = new TrayIcon(IMAGE_ICON);
         trayIcon.setImageAutoSize(true);
+        trayIcon.setToolTip(text("trayIcon.title"));
 
         PopupMenu popupMenu = new PopupMenu();
         MenuItem openItem = new MenuItem(text("popup.open"), new MenuShortcut(KeyEvent.VK_O));

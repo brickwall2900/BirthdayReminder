@@ -38,6 +38,8 @@
   "dialog.notify.config": "Config",
   "dialog.close": "Close",
 
+  "trayIcon.title": "Birthday Reminder",
+
   "errors.title": "ERROR!!",
   "errors.cannotSave": "Unable to save birthday list or configuration! (%s)",
   "errors.instanceAlreadyRunning": "Another instance is already running.",
