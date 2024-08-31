@@ -31,6 +31,8 @@ import java.nio.file.StandardOpenOption;
  *     }
  *
  *     // attempt to lock to this instance in form of a busy-loop
+ *     // you should do this if your application allows
+ *     // for multi-instance launching
  *     public static void someOtherThread() {
  *         while (true) {
  *             if (!lock.isLocked()) {

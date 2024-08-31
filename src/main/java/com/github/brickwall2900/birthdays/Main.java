@@ -33,7 +33,6 @@ public class Main {
     private static BirthdayListEditorGui editorGui;
     private static TrayIcon trayIcon;
     private static InstanceLock lock;
-    private static Timer lockTimer;
 
     private static void swingContext() {
         if (Boolean.getBoolean("dark.mode")) {
@@ -59,11 +58,6 @@ public class Main {
         Timer updater = new Timer(1000, Main::tickUpdate);
         updater.setRepeats(true);
         updater.start();
-
-        Timer lockTheDamnInstance = new Timer(500, Main::tryLockingTheDamnInstance);
-        lockTheDamnInstance.setRepeats(true);
-        lockTheDamnInstance.start();
-        lockTimer = lockTheDamnInstance;
 
         performChecks();
     }
@@ -110,13 +104,6 @@ public class Main {
             Main.today = today;
             performChecks();
         }
-    }
-
-    private static void tryLockingTheDamnInstance(ActionEvent e) {
-        if (lock.isLocked()) {
-            lock.lock();
-        }
-        lockTimer.stop();
     }
 
     public static void performChecks() {
