@@ -2,6 +2,7 @@ package com.github.brickwall2900.birthdays.gui;
 
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
+import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 import org.httprpc.sierra.DatePicker;
 
 import javax.swing.*;
@@ -81,7 +82,7 @@ public class BirthdayEditorGui extends JDialog {
     }
 
     private void onOverrideConfigButtonPressed(ActionEvent e) {
-        BirthdayNotifierConfig.Config defaultConfig = new BirthdayNotifierConfig.Config();
+        BirthdayNotifierConfig.Config defaultConfig = BirthdayNotifierConfig.globalConfig;
         BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, birthday.override != null ? birthday.override : defaultConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
