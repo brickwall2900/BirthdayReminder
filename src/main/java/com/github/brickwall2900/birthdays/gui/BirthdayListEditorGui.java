@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
 
+import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
@@ -43,6 +44,7 @@ public class BirthdayListEditorGui extends JFrame {
         removeButton.setEnabled(false);
         editButton.setEnabled(false);
 
+        setIconImage(IMAGE_ICON);
         setTitle(TITLE);
         setSize(SIZE);
         setLocationRelativeTo(null);
@@ -85,7 +87,11 @@ public class BirthdayListEditorGui extends JFrame {
         DefaultListModel<BirthdayObject> model = (DefaultListModel<BirthdayObject>) birthdayList.getModel();
         BirthdayObject selected = birthdayList.getSelectedValue();
         if (selected != null) {
-            model.removeElement(selected);
+            if (JOptionPane.showConfirmDialog(this,
+                    text("dialog.remove.confirm", selected.name), text("dialog.remove"),
+                    JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
+                model.removeElement(selected);
+            }
         }
     }
 

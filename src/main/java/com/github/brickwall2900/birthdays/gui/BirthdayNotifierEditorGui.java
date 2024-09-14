@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.Locale;
 
+import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
@@ -26,6 +27,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         closeButton.addActionListener(this::onCloseButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
+        setIconImage(IMAGE_ICON);
         setTitle(TITLE);
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);

@@ -2,7 +2,6 @@ package com.github.brickwall2900.birthdays.gui;
 
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
-import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 import org.httprpc.sierra.DatePicker;
 
 import javax.swing.*;
@@ -11,6 +10,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
 
+import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
@@ -32,6 +32,7 @@ public class BirthdayEditorGui extends JDialog {
 
         this.birthday = new BirthdayObject();
 
+        setIconImage(IMAGE_ICON);
         setTitle(text("editor.dialog.title", "???"));
         setSize(SIZE);
         setLocationRelativeTo(parent);

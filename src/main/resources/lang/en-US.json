@@ -38,6 +38,8 @@
   "dialog.notify.config": "Config",
   "dialog.close": "Close",
 
+  "dialog.remove.confirm": "Are you sure you want to remove %s from your birthday list?",
+
   "trayIcon.title": "Birthday Reminder",
 
   "errors.title": "ERROR!!",
