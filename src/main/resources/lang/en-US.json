@@ -20,6 +20,12 @@
   "editor.header": "Add, remove, or edit people's birthday!",
   "editor.object": "%s, at %s; %d days left",
 
+  "editor.sortBy": "Sort By: ",
+  "editor.sortBy.value.NAME": "Names",
+  "editor.sortBy.value.DAYS": "Days",
+  "editor.sortBy.value.DATE": "Date",
+  "editor.sortBy.value.AGE": "Age",
+
   "editor.dialog.title": "Edit %s's birthday...",
   "editor.dialog.fields.name": "Name: ",
   "editor.dialog.fields.date": "Date: ",

@@ -6,13 +6,15 @@ import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BirthdaysManager {
     static {
         try {
-            BirthdayNotifierConfig.load();
+            BirthdayNotifierConfig.loadGlobalConfig();
+            BirthdayNotifierConfig.loadApplicationConfig();
             BirthdaysConfig.load();
         } catch (IOException e) {
             throw new RuntimeException("Cannot load birthdays!", e);
@@ -68,8 +70,12 @@ public class BirthdaysManager {
         return BirthdaysConfig.BIRTHDAY_LIST.toArray(new BirthdayObject[0]);
     }
 
-    public static int getAgeInDays(BirthdayObject object) {
+    public static int getAgeInYears(BirthdayObject object) {
         return LocalDate.now().minusYears(object.date.getYear()).getYear();
+    }
+
+    public static Period getAge(BirthdayObject object) {
+        return Period.between(object.date, LocalDate.now());
     }
 
     public static boolean isMonthAndDayMatching(LocalDate date, LocalDate today) {

@@ -89,7 +89,8 @@ public class Main {
             BirthdaysConfig.BIRTHDAY_LIST.clear();
             BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
             BirthdaysConfig.save();
-            BirthdayNotifierConfig.save();
+            BirthdayNotifierConfig.saveGlobalConfig();
+            BirthdayNotifierConfig.saveApplicationConfig();
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, text("errors.cannotSave", e), text("errors.title"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
@@ -140,7 +141,7 @@ public class Main {
         Clip clip = playSound(birthday);
         String labelContent = text("notify.content",
                 birthday.name,
-                BirthdaysManager.getAgeInDays(birthday),
+                BirthdaysManager.getAgeInYears(birthday),
                 birthday.customMessage != null
                         ? birthday.customMessage
                         : MESSAGES[(int) (Math.random() * MESSAGES.length)]);

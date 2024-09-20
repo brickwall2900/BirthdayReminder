@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.BirthdaysManager;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
@@ -11,6 +12,8 @@ import java.awt.event.ActionEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.Objects;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
@@ -33,6 +36,10 @@ public class BirthdayListEditorGui extends JFrame {
         editButton.addActionListener(this::onEditButtonPressed);
         configButton.addActionListener(this::onConfigButtonPressed);
         birthdayList.addListSelectionListener(this::onListSelectionChanged);
+        sortByComboBox.addActionListener(this::onSortSelectionChanged);
+
+        sortByComboBox.setRenderer(new EnumToTextListCellRenderer<>("editor.sortBy.value"));
+        sortByComboBox.setSelectedItem(BirthdayNotifierConfig.applicationConfig.sortByOption);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -53,7 +60,11 @@ public class BirthdayListEditorGui extends JFrame {
 
     private void buildContentPane() {
         JPanel contentPane = column(4,
-                cell(headerLabel = new JLabel(text("editor.header"))),
+                row(4,
+                        cell(headerLabel = new JLabel(text("editor.header"))),
+                        glue(),
+                        cell(sortByLabel = new JLabel(text("editor.sortBy"))),
+                        cell(sortByComboBox = new JComboBox<>(new DefaultComboBoxModel<>(SortByOption.values()))).weightBy(1)),
                 cell(birthdayScrollPane = new JScrollPane(birthdayList = new JList<>())).weightBy(1),
                 row(4,
                         cell(addButton = new JButton(text("dialog.add"))),
@@ -122,6 +133,20 @@ public class BirthdayListEditorGui extends JFrame {
         editButton.setEnabled(selected != null);
     }
 
+    private void onSortSelectionChanged(ActionEvent e) {
+        SortByOption option = (SortByOption) Objects.requireNonNull(sortByComboBox.getSelectedItem(), "null?");
+        sortList(option);
+        BirthdayNotifierConfig.applicationConfig.sortByOption = option;
+    }
+
+    public void sortList(SortByOption option) {
+        DefaultListModel<BirthdayObject> model = (DefaultListModel<BirthdayObject>) birthdayList.getModel();
+        BirthdayObject[] objects = getBirthdays(); // get all elements of the list first
+        Arrays.sort(objects, option.comparator); // sort
+        model.clear();
+        model.addAll(Arrays.asList(objects)); // clear list then add sorted elements
+    }
+
     public BirthdayObject[] getBirthdays() {
         DefaultListModel<BirthdayObject> model = (DefaultListModel<BirthdayObject>) birthdayList.getModel();
         Object[] o = model.toArray(); // will be BirthdayObject[] trust me
@@ -131,7 +156,48 @@ public class BirthdayListEditorGui extends JFrame {
     }
 
     public JLabel headerLabel;
+    public JLabel sortByLabel;
+    public JComboBox<SortByOption> sortByComboBox;
     public JScrollPane birthdayScrollPane;
     public JList<BirthdayObject> birthdayList;
     public JButton addButton, removeButton, editButton, configButton, closeButton;
+
+    public enum SortByOption {
+        // idk what I'm doing here
+        // I swear I'm not high on drugs huhu ;-;
+        NAME(SortByOption::sortByName),
+        DAYS(SortByOption::sortByDays),
+        DATE(SortByOption::sortByDate),
+        AGE(SortByOption::sortByDate);
+
+        final Comparator<BirthdayObject> comparator;
+
+        SortByOption(Comparator<BirthdayObject> comparator) {
+            this.comparator = comparator;
+        }
+
+        private static int sortByName(BirthdayObject obj, BirthdayObject other) {
+            return obj.name.compareTo(other.name);
+        }
+
+        private static int sortByDays(BirthdayObject obj, BirthdayObject other) {
+            long days = BirthdaysManager.getDaysBeforeBirthday(obj);
+            long otherDays = BirthdaysManager.getDaysBeforeBirthday(other);
+            return Long.compare(days, otherDays);
+        }
+
+        // this is pretty redundant ;-;
+        // dates sort the exact same way as ages
+        // the older the date, the older the age
+        // remove?
+        private static int sortByAge(BirthdayObject obj, BirthdayObject other) {
+            long months = BirthdaysManager.getAge(obj).toTotalMonths();
+            long otherMonths = BirthdaysManager.getAge(other).toTotalMonths();
+            return Long.compare(otherMonths, months);
+        }
+
+        private static int sortByDate(BirthdayObject obj, BirthdayObject other) {
+            return obj.date.compareTo(other.date);
+        }
+    }
 }
