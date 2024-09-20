@@ -15,8 +15,10 @@ import java.util.Objects;
 public class BirthdayNotifierConfig {
     public static final Path GLOBAL_PATH = Paths.get(System.getProperty("user.home"), "BirthdayReminder");
     public static final Path NOTIFIER_CONFIG_PATH = GLOBAL_PATH.resolve("notifier.json");
+    public static final Path APP_CONFIG_PATH = GLOBAL_PATH.resolve("application.json");
     public static Config globalConfig = new Config();
-    public static boolean loaded;
+    public static ApplicationConfig applicationConfig = new ApplicationConfig();
+    private static final Gson gson;
 
     static {
         if (!Files.exists(GLOBAL_PATH)) {
@@ -26,34 +28,43 @@ public class BirthdayNotifierConfig {
                 throw new RuntimeException("Cannot create global folder: " + GLOBAL_PATH, e);
             }
         }
-    }
 
-    public static void load() throws IOException {
-        if (!loaded) {
-            if (!Files.exists(NOTIFIER_CONFIG_PATH)) {
-                save();
-            }
-            GsonBuilder builder = new GsonBuilder();
-            Gson gson = builder
-                    .setPrettyPrinting()
-                    .serializeNulls()
-                    .create();
-            try (BufferedReader reader = Files.newBufferedReader(NOTIFIER_CONFIG_PATH);
-                 JsonReader jsonReader = new JsonReader(reader)) {
-                globalConfig = gson.fromJson(jsonReader, Config.class);
-            }
-            loaded = true;
-        }
-    }
-
-    public static void save() throws IOException {
         GsonBuilder builder = new GsonBuilder();
-        Gson gson = builder
+        gson = builder
                 .setPrettyPrinting()
                 .serializeNulls()
                 .create();
+    }
+
+    public static void loadGlobalConfig() throws IOException {
+        if (!Files.exists(NOTIFIER_CONFIG_PATH)) {
+            saveGlobalConfig();
+        }
+        try (BufferedReader reader = Files.newBufferedReader(NOTIFIER_CONFIG_PATH);
+             JsonReader jsonReader = new JsonReader(reader)) {
+            globalConfig = gson.fromJson(jsonReader, Config.class);
+        }
+    }
+
+    public static void saveGlobalConfig() throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(NOTIFIER_CONFIG_PATH)) {
             gson.toJson(globalConfig, writer);
+        }
+    }
+
+    public static void loadApplicationConfig() throws IOException {
+        if (!Files.exists(APP_CONFIG_PATH)) {
+            saveApplicationConfig();
+        }
+        try (BufferedReader reader = Files.newBufferedReader(APP_CONFIG_PATH);
+             JsonReader jsonReader = new JsonReader(reader)) {
+            applicationConfig = gson.fromJson(jsonReader, ApplicationConfig.class);
+        }
+    }
+
+    public static void saveApplicationConfig() throws IOException {
+        try (BufferedWriter writer = Files.newBufferedWriter(APP_CONFIG_PATH)) {
+            gson.toJson(applicationConfig, writer);
         }
     }
 

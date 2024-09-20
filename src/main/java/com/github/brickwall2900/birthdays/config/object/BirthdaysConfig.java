@@ -19,34 +19,29 @@ import java.util.List;
 public class BirthdaysConfig {
     public static final Path PATH = BirthdayNotifierConfig.GLOBAL_PATH.resolve("birthdays.json");
     public static final List<BirthdayObject> BIRTHDAY_LIST = new ArrayList<>();
-    private static boolean loaded;
+    private static final Gson gson;
 
-    public static void load() throws IOException {
-        if (!loaded) {
-            if (!Files.exists(PATH)) {
-                Files.createFile(PATH);
-                Files.writeString(PATH, new JsonArray().toString());
-            }
-            GsonBuilder gsonBuilder = new GsonBuilder();
-            gsonBuilder
-                    .setPrettyPrinting()
-                    .registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
-            Gson gson = gsonBuilder.create();
-            try (BufferedReader reader = Files.newBufferedReader(PATH);
-                 JsonReader jsonReader = new JsonReader(reader)) {
-                BirthdayObject[] objects = gson.fromJson(jsonReader, BirthdayObject[].class);
-                BIRTHDAY_LIST.addAll(Arrays.asList(objects));
-            }
-            loaded = true;
-        }
-    }
-
-    public static void save() throws IOException {
+    static {
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder
                 .setPrettyPrinting()
                 .registerTypeAdapter(LocalDate.class, new LocalDateAdapter());
-        Gson gson = gsonBuilder.create();
+        gson = gsonBuilder.create();
+    }
+
+    public static void load() throws IOException {
+        if (!Files.exists(PATH)) {
+            Files.createFile(PATH);
+            Files.writeString(PATH, new JsonArray().toString());
+        }
+        try (BufferedReader reader = Files.newBufferedReader(PATH);
+             JsonReader jsonReader = new JsonReader(reader)) {
+            BirthdayObject[] objects = gson.fromJson(jsonReader, BirthdayObject[].class);
+            BIRTHDAY_LIST.addAll(Arrays.asList(objects));
+        }
+    }
+
+    public static void save() throws IOException {
         String output = gson.toJson(BIRTHDAY_LIST.toArray(new BirthdayObject[0]));
         Files.writeString(PATH, output); // prevent file cutoffs
     }
