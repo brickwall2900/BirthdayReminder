@@ -8,6 +8,7 @@ import javax.swing.*;
 
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
@@ -37,6 +38,10 @@ public class BirthdayEditorGui extends JDialog {
         overrideConfigButton.setToolTipText(text("editor.dialog.fields.override.tip"));
 
         this.birthday = new BirthdayObject();
+
+        getRootPane().registerKeyboardAction(this::onEscapePressed,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setIconImage(IMAGE_ICON);
         setTitle(text("editor.dialog.title", "???"));
@@ -82,6 +87,10 @@ public class BirthdayEditorGui extends JDialog {
                         cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
         contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
         setContentPane(contentPane);
+    }
+    
+    private void onEscapePressed(ActionEvent e) {
+        dispose();
     }
 
     private void onCloseButtonPressed(ActionEvent e) {

@@ -6,6 +6,7 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Locale;
 
@@ -29,6 +30,10 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         daysBeforeReminderSpinner.setToolTipText(text("notify.editor.dialog.daysBeforeReminder.tip"));
         birthdaySoundPath.setToolTipText(text("notify.editor.dialog.birthdaySound.tip"));
+
+        getRootPane().registerKeyboardAction(this::onEscapePressed,
+                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
+                JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setIconImage(IMAGE_ICON);
         setTitle(TITLE);
@@ -59,6 +64,10 @@ public class BirthdayNotifierEditorGui extends JDialog {
                         cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
         contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
         setContentPane(contentPane);
+    }
+
+    private void onEscapePressed(ActionEvent e) {
+        dispose();
     }
 
     private void onCloseButtonPressed(ActionEvent e) {
