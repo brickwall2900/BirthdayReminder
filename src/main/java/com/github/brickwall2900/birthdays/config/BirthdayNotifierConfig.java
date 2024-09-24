@@ -56,10 +56,15 @@ public class BirthdayNotifierConfig {
         if (!Files.exists(APP_CONFIG_PATH)) {
             saveApplicationConfig();
         }
+        // Application config goes unused for now.
+        // Either it will try to find its purpose later
+        // ...or it will commit delete itself.
+        /*
         try (BufferedReader reader = Files.newBufferedReader(APP_CONFIG_PATH);
              JsonReader jsonReader = new JsonReader(reader)) {
             applicationConfig = gson.fromJson(jsonReader, ApplicationConfig.class);
         }
+         */
     }
 
     public static void saveApplicationConfig() throws IOException {

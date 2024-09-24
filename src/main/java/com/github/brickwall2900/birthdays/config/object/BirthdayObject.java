@@ -41,6 +41,7 @@ public class BirthdayObject {
         return String.format(text("editor.object"),
                 name,
                 date.format(DATE_TO_STING_FORMATTER),
-                BirthdaysManager.getDaysBeforeBirthday(this)) + (!enabled ? " <DISABLED>" : "");
+                BirthdaysManager.getDaysBeforeBirthday(this),
+                BirthdaysManager.getAgeInYears(this)) + (!enabled ? " <DISABLED>" : "");
     }
 }

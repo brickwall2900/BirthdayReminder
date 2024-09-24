@@ -101,6 +101,8 @@ public class Main {
 
     public static void tickUpdate(ActionEvent e) {
         LocalDate today = LocalDate.now();
+        // update date tooltip lol
+        editorGui.headerLabel.setToolTipText(text("editor.header.tip", today.toString()));
         if (!Main.today.equals(today)) { // day has changed, go update lol
             Main.today = today;
             performChecks();

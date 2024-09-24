@@ -30,6 +30,12 @@ public class BirthdayEditorGui extends JDialog {
         removeOverrideConfigButton.addActionListener(this::onRemoveOverrideConfigButtonPressed);
         removeOverrideConfigButton.setEnabled(false);
 
+        nameField.setToolTipText(text("editor.dialog.fields.name.tip"));
+        datePicker.setToolTipText(text("editor.dialog.fields.date.tip"));
+        enabledCheckBox.setToolTipText(text("editor.dialog.fields.enabled.tip"));
+        customMessageField.setToolTipText(text("editor.dialog.fields.customMessage.tip"));
+        overrideConfigButton.setToolTipText(text("editor.dialog.fields.override.tip"));
+
         this.birthday = new BirthdayObject();
 
         setIconImage(IMAGE_ICON);

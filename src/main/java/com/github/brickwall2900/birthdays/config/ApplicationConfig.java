@@ -1,7 +1,5 @@
 package com.github.brickwall2900.birthdays.config;
 
-import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
-
 public class ApplicationConfig {
-    public BirthdayListEditorGui.SortByOption sortByOption = BirthdayListEditorGui.SortByOption.NAME;
+    public String unused = "Why did the chicken cross the road? I don't know.";
 }

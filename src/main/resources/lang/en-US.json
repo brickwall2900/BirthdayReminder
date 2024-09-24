@@ -18,13 +18,14 @@
 
   "editor.title": "Birthday Reminder Editor",
   "editor.header": "Add, remove, or edit people's birthday!",
-  "editor.object": "%s, at %s; %d days left",
+  "editor.header.tip": "Today is %s",
+  "editor.object": "%s, at %s; %d days left, %d y/o",
 
-  "editor.sortBy": "Sort By: ",
-  "editor.sortBy.value.NAME": "Names",
-  "editor.sortBy.value.DAYS": "Days",
-  "editor.sortBy.value.DATE": "Date",
-  "editor.sortBy.value.AGE": "Age",
+  "editor.table.unknown": "Unknown",
+  "editor.table.column.names": "Names",
+  "editor.table.column.dates": "Birthdate",
+  "editor.table.column.age": "Age",
+  "editor.table.column.days": "Days",
 
   "editor.dialog.title": "Edit %s's birthday...",
   "editor.dialog.fields.name": "Name: ",
@@ -33,10 +34,18 @@
   "editor.dialog.fields.customMessage": "Custom Message: ",
   "editor.dialog.fields.override": "Override Config: ",
 
+  "editor.dialog.fields.name.tip": "Who's the name of this person?",
+  "editor.dialog.fields.date.tip": "When's their birthday?",
+  "editor.dialog.fields.enabled.tip": "Should this birthday be reminded and notified?",
+  "editor.dialog.fields.customMessage.tip": "What message do you want to say when notified?",
+  "editor.dialog.fields.override.tip": "Specifies how the birthday should be notified specifically for this birthday.",
+
   "notify.editor.dialog.title": "Notifier Editor",
   "notify.editor.dialog.daysBeforeReminder": "Days before reminder: ",
   "notify.editor.dialog.birthdaySoundLabel": "Sound path: ",
   "notify.editor.dialog.birthdaySound.fileType": "WAV File (.wav)",
+  "notify.editor.dialog.daysBeforeReminder.tip": "Specifies the number of days in advance to remind you of people's/this person's birthdays.",
+  "notify.editor.dialog.birthdaySound.tip": "The location of the sound file played when today's their birthday.",
 
   "dialog.add": "Add",
   "dialog.remove": "Remove",

@@ -27,6 +27,9 @@ public class BirthdayNotifierEditorGui extends JDialog {
         closeButton.addActionListener(this::onCloseButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
+        daysBeforeReminderSpinner.setToolTipText(text("notify.editor.dialog.daysBeforeReminder.tip"));
+        birthdaySoundPath.setToolTipText(text("notify.editor.dialog.birthdaySound.tip"));
+
         setIconImage(IMAGE_ICON);
         setTitle(TITLE);
         setSize(SIZE);
