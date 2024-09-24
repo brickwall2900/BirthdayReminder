@@ -12,6 +12,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
@@ -35,7 +36,15 @@ public class BirthdayListEditorGui extends JFrame {
         birthdayTable.setColumnSelectionAllowed(false);
         birthdayTable.setRowSelectionAllowed(true);
         birthdayTable.getTableHeader().setReorderingAllowed(false);
-        birthdayTable.setRowSorter(new BirthdayObjectTableModel.BirthdayTableSorter(tableModel));
+
+        BirthdayObjectTableModel.BirthdayTableSorter tableSorter = new BirthdayObjectTableModel.BirthdayTableSorter(tableModel);
+        birthdayTable.setRowSorter(tableSorter);
+        tableSorter.setSortsOnUpdates(true);
+
+        // sort by names on startup
+        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+        tableSorter.setSortKeys(sortKeys);
 
         closeButton.addActionListener(this::onCloseButtonPressed);
         addButton.addActionListener(this::onAddButtonPressed);

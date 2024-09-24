@@ -15,7 +15,7 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayEditorGui extends JDialog {
-    public static final Dimension SIZE = new Dimension(400, 200);
+    public static final Dimension SIZE = new Dimension(400, 220);
     public static final int BORDER = 8;
 
     private BirthdayObject birthday;

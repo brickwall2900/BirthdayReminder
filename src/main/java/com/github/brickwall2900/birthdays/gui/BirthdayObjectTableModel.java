@@ -90,6 +90,17 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
         };
     }
 
+    @Override
+    public Class<?> getColumnClass(int columnIndex) {
+        return switch (columnIndex) {
+            case COL_NAMES -> String.class;
+            case COL_DATES -> LocalDate.class;
+            case COL_AGE -> Integer.class;
+            case COL_DAYS -> Long.class;
+            default -> super.getColumnClass(columnIndex);
+        };
+    }
+
     public static class BirthdayTableSorter extends TableRowSorter<BirthdayObjectTableModel> {
         public BirthdayTableSorter(BirthdayObjectTableModel model) {
             super(model);
