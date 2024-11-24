@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 public class BirthdaysManager {
-    static {
+    public static void loadEverything() {
         try {
             BirthdayNotifierConfig.loadGlobalConfig();
             BirthdayNotifierConfig.loadApplicationConfig();
@@ -23,6 +23,14 @@ public class BirthdaysManager {
 
     public static BirthdayObject[] getBirthdaysToday() {
         return getBirthdaysOffset(0);
+    }
+
+    public static BirthdayObject[] getBirthdaysSince(LocalDate date) {
+        List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
+        List<BirthdayObject> birthdaysToday = birthdayList.stream()
+                .filter(obj -> obj.enabled && isBirthdaySince(obj, date))
+                .toList();
+        return birthdaysToday.toArray(new BirthdayObject[0]);
     }
 
     public static BirthdayObject[] getBirthdaysOffset(int days) {
@@ -64,6 +72,35 @@ public class BirthdaysManager {
     public static boolean isBirthdayToday(BirthdayObject birthday) {
         LocalDate day = LocalDate.now();
         return isMonthAndDayMatching(birthday.date, day);
+    }
+
+    public static boolean isBirthdaySince(BirthdayObject birthday, LocalDate since) {
+        LocalDate today = LocalDate.now();
+
+        LocalDate birthdayThisYear = birthday.date.withYear(today.getYear());
+        LocalDate birthdayLastYear = birthday.date.withYear(today.getYear() - 1);
+
+        // Check if the birthday was between lastAlive and today
+        if (birthdayThisYear.isAfter(since) && birthdayThisYear.isBefore(today.plusDays(1))) {
+            return true;
+        }
+
+        // Check if lastAlive is in a different year and birthday last year was between
+        return since.getYear() < today.getYear() &&
+                birthdayLastYear.isAfter(since) && birthdayLastYear.isBefore(today.plusDays(1));
+    }
+
+    public static long getDaysSinceBirthday(BirthdayObject birthday) {
+        LocalDate today = LocalDate.now();
+
+        // Adjust the birthday to the most recent occurrence
+        LocalDate lastBirthday = birthday.date.withYear(today.getYear());
+        if (lastBirthday.isAfter(today)) {
+            lastBirthday = lastBirthday.minusYears(1); // Use the birthday from the previous year
+        }
+
+        // Calculate days passed since the last birthday
+        return ChronoUnit.DAYS.between(lastBirthday, today);
     }
 
     public static BirthdayObject[] getAllBirthdays() {

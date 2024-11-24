@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.config;
 
+import com.github.brickwall2900.birthdays.adapters.LocalDateAdapter;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
@@ -10,6 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.util.Objects;
 
 public class BirthdayNotifierConfig {
@@ -33,6 +35,7 @@ public class BirthdayNotifierConfig {
         gson = builder
                 .setPrettyPrinting()
                 .serializeNulls()
+                .registerTypeAdapter(LocalDate.class, new LocalDateAdapter())
                 .create();
     }
 
@@ -56,15 +59,10 @@ public class BirthdayNotifierConfig {
         if (!Files.exists(APP_CONFIG_PATH)) {
             saveApplicationConfig();
         }
-        // Application config goes unused for now.
-        // Either it will try to find its purpose later
-        // ...or it will commit delete itself.
-        /*
         try (BufferedReader reader = Files.newBufferedReader(APP_CONFIG_PATH);
              JsonReader jsonReader = new JsonReader(reader)) {
             applicationConfig = gson.fromJson(jsonReader, ApplicationConfig.class);
         }
-         */
     }
 
     public static void saveApplicationConfig() throws IOException {

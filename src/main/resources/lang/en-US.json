@@ -9,8 +9,11 @@
     "Let them know you're thinking about them!",
     "Go cheer them up!"
   ],
-  "notify.title": "Today is %s's birthday!!!",
+  "notify.title": "%s's birthday!!!",
   "notify.content": "Today is %s's birthday! They are %d years old! %s",
+
+  "notify.late.content.yesterday": "Yesterday was %s's birthday! They are now %d years old.",
+  "notify.late.content.more": "%s's birthday was %d days ago! They are now %d years old.",
 
   "notify.before.caption": "I just want to let you know...",
   "notify.before.text.tomorrow": "Tomorrow is %s's birthday!",

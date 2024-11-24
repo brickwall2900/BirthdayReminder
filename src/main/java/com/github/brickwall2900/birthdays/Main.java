@@ -1,6 +1,6 @@
 package com.github.brickwall2900.birthdays;
 
-import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
@@ -35,8 +35,9 @@ public class Main {
     private static InstanceLock lock;
 
     private static void swingContext() {
-        if (Boolean.getBoolean("dark.mode")) {
-            FlatDarkLaf.setup();
+        BirthdaysManager.loadEverything();
+        if (BirthdayNotifierConfig.applicationConfig.darkMode) {
+            FlatDarculaLaf.setup();
         } else {
             FlatLightLaf.setup();
         }
@@ -60,6 +61,7 @@ public class Main {
         updater.start();
 
         performChecks();
+        BirthdayNotifierConfig.applicationConfig.lastAlive = today;
     }
 
     public static void buildTrayIcon() {
@@ -104,13 +106,15 @@ public class Main {
         // update date tooltip lol
         editorGui.headerLabel.setToolTipText(text("editor.header.tip", today.toString()));
         if (!Main.today.equals(today)) { // day has changed, go update lol
-            Main.today = today;
             performChecks();
+            BirthdayNotifierConfig.applicationConfig.lastAlive = today;
+            Main.today = today;
         }
     }
 
     public static void performChecks() {
-        BirthdayObject[] birthdaysToday = BirthdaysManager.getBirthdaysToday();
+        LocalDate lastAlive = BirthdayNotifierConfig.applicationConfig.lastAlive;
+        BirthdayObject[] birthdaysToday = BirthdaysManager.getBirthdaysSince(lastAlive);
         BirthdayObject[] allBirthdays = BirthdaysManager.getAllBirthdays();
         // notify them
         for (BirthdayObject birthday : birthdaysToday) {
@@ -140,13 +144,27 @@ public class Main {
     }
 
     public static void notifyBirthday(BirthdayObject birthday) {
+        long daysApart = BirthdaysManager.getDaysSinceBirthday(birthday);
         Clip clip = playSound(birthday);
-        String labelContent = text("notify.content",
-                birthday.name,
-                BirthdaysManager.getAgeInYears(birthday),
-                birthday.customMessage != null
-                        ? birthday.customMessage
-                        : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
+        String labelContent;
+        System.out.println(daysApart);
+        if (daysApart == 0) {
+            labelContent = text("notify.content",
+                    birthday.name,
+                    BirthdaysManager.getAgeInYears(birthday),
+                    birthday.customMessage != null
+                            ? birthday.customMessage
+                            : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
+        } else if (daysApart == 1) {
+            labelContent = text("notify.late.content.yesterday",
+                    birthday.name,
+                    BirthdaysManager.getAgeInYears(birthday));
+        } else {
+            labelContent = text("notify.late.content.more",
+                    birthday.name,
+                    daysApart,
+                    BirthdaysManager.getAgeInYears(birthday));
+        }
         String title = text("notify.title", birthday.name);
         JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
         JDialog dialog = optionPane.createDialog(title);
