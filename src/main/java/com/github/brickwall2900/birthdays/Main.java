@@ -35,6 +35,7 @@ public class Main {
     private static InstanceLock lock;
 
     private static void swingContext() {
+        Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 2);
         BirthdaysManager.loadEverything();
         if (BirthdayNotifierConfig.applicationConfig.darkMode) {
             FlatDarculaLaf.setup();
@@ -56,7 +57,7 @@ public class Main {
 
         buildTrayIcon();
 
-        Timer updater = new Timer(1000, Main::tickUpdate);
+        Timer updater = new Timer(2000, Main::tickUpdate);
         updater.setRepeats(true);
         updater.start();
 
@@ -103,8 +104,6 @@ public class Main {
 
     public static void tickUpdate(ActionEvent e) {
         LocalDate today = LocalDate.now();
-        // update date tooltip lol
-        editorGui.headerLabel.setToolTipText(text("editor.header.tip", today.toString()));
         if (!Main.today.equals(today)) { // day has changed, go update lol
             performChecks();
             BirthdayNotifierConfig.applicationConfig.lastAlive = today;
@@ -195,6 +194,7 @@ public class Main {
                 return clip;
             } catch (LineUnavailableException | IOException | UnsupportedAudioFileException e) {
                 System.err.println("Cannot open a line for " + soundLocation);
+                Toolkit.getDefaultToolkit().beep();
                 e.printStackTrace();
             }
         }
