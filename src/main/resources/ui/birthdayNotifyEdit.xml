@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE column-panel SYSTEM "sierra.dtd">
+
+<column-panel padding="8" spacing="4">
+    <row-panel spacing="4" >
+        <label name="daysBeforeReminderLabel" text="notify.editor.dialog.daysBeforeReminder" />
+        <spinner name="daysBeforeReminderSpinner" weight="1" />
+    </row-panel>
+
+    <row-panel spacing="4" >
+        <label name="birthdaySoundLabel" text="notify.editor.dialog.birthdaySoundLabel" />
+        <text-field name="birthdaySoundPath" weight="1" />
+        <button name="birthdaySoundChooserButton" text="dialog.more" />
+    </row-panel>
+
+    <spacer weight="1" />
+
+    <row-panel spacing="4">
+        <spacer weight="1" />
+        <button name="closeButton" text="dialog.close" />
+    </row-panel>
+</column-panel>

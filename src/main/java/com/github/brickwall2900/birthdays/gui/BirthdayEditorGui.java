@@ -3,6 +3,7 @@ package com.github.brickwall2900.birthdays.gui;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import org.httprpc.sierra.DatePicker;
+import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
 
@@ -12,8 +13,8 @@ import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
+import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
-import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayEditorGui extends JDialog {
     public static final Dimension SIZE = new Dimension(400, 250);
@@ -24,7 +25,8 @@ public class BirthdayEditorGui extends JDialog {
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
         super(parent);
 
-        buildContentPane();
+        setContentPane(UILoader.load(this, "/ui/birthdayEditor.xml", BUNDLE));
+
         enabledCheckBox.setSelected(true);
         closeButton.addActionListener(this::onCloseButtonPressed);
         overrideConfigButton.addActionListener(this::onOverrideConfigButtonPressed);
@@ -61,32 +63,6 @@ public class BirthdayEditorGui extends JDialog {
         customMessageField.setText(birthday.customMessage);
 
         removeOverrideConfigButton.setEnabled(birthday.override != null);
-    }
-
-    private void buildContentPane() {
-        JPanel contentPane = column(4,
-                row(4,
-                        cell(nameLabel = new JLabel(text("editor.dialog.fields.name"))),
-                        cell(nameField = new JTextField()).weightBy(1)),
-                row(4,
-                        cell(dateLabel = new JLabel(text("editor.dialog.fields.date"))),
-                        cell(datePicker = new DatePicker()).weightBy(1)),
-                row(4,
-                        cell(enabledLabel = new JLabel(text("editor.dialog.fields.enabled"))),
-                        cell(enabledCheckBox = new JCheckBox())),
-                row(4,
-                        cell(customMessageLabel = new JLabel(text("editor.dialog.fields.customMessage"))),
-                        cell(customMessageField = new JTextField()).weightBy(1)),
-                row(4,
-                        cell(overrideConfigLabel = new JLabel(text("editor.dialog.fields.override"))),
-                        cell(overrideConfigButton = new JButton(text("dialog.edit"))).weightBy(1),
-                        cell(removeOverrideConfigButton = new JButton(text("dialog.remove")))),
-                glue(),
-                row(4,
-                        glue(),
-                        cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
-        contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
-        setContentPane(contentPane);
     }
     
     private void onEscapePressed(ActionEvent e) {

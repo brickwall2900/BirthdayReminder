@@ -3,6 +3,7 @@ package com.github.brickwall2900.birthdays.gui;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
+import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
@@ -15,8 +16,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
+import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
-import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayListEditorGui extends JFrame {
     public static final String TITLE = text("editor.title");
@@ -26,8 +27,10 @@ public class BirthdayListEditorGui extends JFrame {
     private final BirthdayObjectTableModel tableModel;
 
     public BirthdayListEditorGui(BirthdayObject[] objects) {
-        buildContentPane();
+        setContentPane(UILoader.load(this, "/ui/birthdayList.xml", BUNDLE));
 
+        birthdayTable = new JTable();
+        birthdayScrollPane.setViewportView(birthdayTable);
         tableModel = new BirthdayObjectTableModel();
         tableModel.setBirthdayObjects(new ArrayList<>(Arrays.asList(objects)));
         birthdayTable.setAutoCreateRowSorter(false);
@@ -68,23 +71,6 @@ public class BirthdayListEditorGui extends JFrame {
         setSize(SIZE);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-    }
-
-    private void buildContentPane() {
-        JPanel contentPane = column(4,
-                row(4,
-                        cell(headerLabel = new JLabel(text("editor.header")))),
-//                cell(birthdayScrollPane = new JScrollPane(birthdayList = new JList<>())).weightBy(1),
-                cell(birthdayScrollPane = new JScrollPane(birthdayTable = new JTable())).weightBy(1),
-                row(4,
-                        cell(addButton = new JButton(text("dialog.add"))),
-                        cell(removeButton = new JButton(text("dialog.remove"))),
-                        cell(editButton = new JButton(text("dialog.edit"))),
-                        cell(configButton = new JButton(text("dialog.notify.config"))),
-                        glue(),
-                        cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
-        contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
-        setContentPane(contentPane);
     }
 
     private void onCloseButtonPressed(ActionEvent e) {

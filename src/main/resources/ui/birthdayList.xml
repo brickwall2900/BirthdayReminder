@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE column-panel SYSTEM "sierra.dtd">
+
+<column-panel padding="8" spacing="4">
+    <label name="headerLabel" text="editor.header" />
+    <scroll-pane name="birthdayScrollPane" weight="1" />
+
+    <row-panel spacing="4">
+        <button name="addButton" text="dialog.add" />
+        <button name="removeButton" text="dialog.remove" />
+        <button name="editButton" text="dialog.edit" />
+        <button name="configButton" text="dialog.notify.config" />
+
+        <spacer weight="1" />
+
+        <button name="closeButton" text="dialog.close" />
+    </row-panel>
+</column-panel>

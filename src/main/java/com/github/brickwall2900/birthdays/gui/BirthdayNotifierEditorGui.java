@@ -1,6 +1,7 @@
 package com.github.brickwall2900.birthdays.gui;
 
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
@@ -11,8 +12,8 @@ import java.io.File;
 import java.util.Locale;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
+import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
-import static org.httprpc.sierra.UIBuilder.*;
 
 public class BirthdayNotifierEditorGui extends JDialog {
     public static final String TITLE = text("notify.editor.dialog.title");
@@ -22,7 +23,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
     public BirthdayNotifierEditorGui(Window owner) {
         super(owner);
 
-        buildContentPane();
+        setContentPane(UILoader.load(this, "/ui/birthdayNotifyEdit.xml", BUNDLE));
 
         daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 1, 30, 1));
         closeButton.addActionListener(this::onCloseButtonPressed);
@@ -47,23 +48,6 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         daysBeforeReminderSpinner.setValue(config.daysBeforeReminder);
         birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath : null);
-    }
-
-    private void buildContentPane() {
-        JPanel contentPane = column(4,
-                row(4,
-                        cell(daysBeforeReminderLabel = new JLabel(text("notify.editor.dialog.daysBeforeReminder"))),
-                        cell(daysBeforeReminderSpinner = new JSpinner()).weightBy(1)),
-                row(4,
-                        cell(birthdaySoundLabel = new JLabel(text("notify.editor.dialog.birthdaySoundLabel"))),
-                        cell(birthdaySoundPath = new JTextField()).weightBy(1),
-                        cell(birthdaySoundChooserButton = new JButton(">"))),
-                glue(),
-                row(4,
-                        glue(),
-                        cell(closeButton = new JButton(text("dialog.close"))))).getComponent();
-        contentPane.setBorder(BorderFactory.createEmptyBorder(BORDER, BORDER, BORDER, BORDER));
-        setContentPane(contentPane);
     }
 
     private void onEscapePressed(ActionEvent e) {

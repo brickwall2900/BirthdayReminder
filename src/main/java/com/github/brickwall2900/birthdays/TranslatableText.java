@@ -3,7 +3,7 @@ package com.github.brickwall2900.birthdays;
 import java.util.ResourceBundle;
 
 public class TranslatableText {
-    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle("lang.lang");
+    public static final ResourceBundle BUNDLE = ResourceBundle.getBundle("lang.lang");
 
     public static String text(String key, Object... objects) {
         return BUNDLE.getString(key).formatted(objects);
