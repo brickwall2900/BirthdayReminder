@@ -108,7 +108,7 @@ public class BirthdaysManager {
     }
 
     public static int getAgeInYears(BirthdayObject object) {
-        return LocalDate.now().minusYears(object.date.getYear()).getYear();
+        return getAge(object).getYears();
     }
 
     public static Period getAge(BirthdayObject object) {
