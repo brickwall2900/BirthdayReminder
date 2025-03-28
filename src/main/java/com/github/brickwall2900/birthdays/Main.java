@@ -50,15 +50,6 @@ public class Main {
         }
 
         editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
-        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
-            save();
-            editorGui = null;
-            lock.unlock();
-            if (systemTray != null) {
-                systemTray.shutdown();
-            }
-        }));
-
         buildTrayIcon();
 
         Timer updater = new Timer(2000, Main::tickUpdate);
@@ -67,6 +58,16 @@ public class Main {
 
         performChecks();
         BirthdayNotifierConfig.applicationConfig.lastAlive = today;
+    }
+
+    private static void onShutdown() {
+        save();
+        editorGui = null;
+        lock.unlock();
+        if (systemTray != null) {
+            systemTray.shutdown();
+        }
+        System.exit(0);
     }
 
     public static void buildTrayIcon() {
@@ -78,7 +79,7 @@ public class Main {
         JMenuItem openItem = new JMenuItem(text("popup.open"), KeyEvent.VK_O);
         JMenuItem exitItem = new JMenuItem(text("popup.exit"), KeyEvent.VK_E);
         openItem.addActionListener(e -> SwingUtilities.invokeLater(Main::openEditorGui));
-        exitItem.addActionListener(e -> SwingUtilities.invokeLater(() -> System.exit(0)));
+        exitItem.addActionListener(e -> SwingUtilities.invokeLater(Main::onShutdown));
         popupMenu.add(openItem);
         popupMenu.add(exitItem);
         systemTray.setMenu(popupMenu);
@@ -93,8 +94,10 @@ public class Main {
 
     public static void save() {
         try {
-            BirthdaysConfig.BIRTHDAY_LIST.clear();
-            BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
+            if (editorGui != null) {
+                BirthdaysConfig.BIRTHDAY_LIST.clear();
+                BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
+            }
             BirthdaysConfig.save();
             BirthdayNotifierConfig.saveGlobalConfig();
             BirthdayNotifierConfig.saveApplicationConfig();
@@ -156,7 +159,6 @@ public class Main {
         long daysApart = BirthdaysManager.getDaysSinceBirthday(birthday);
         Clip clip = playSound(birthday);
         String labelContent;
-        System.out.println(daysApart);
         if (daysApart == 0) {
             labelContent = text("notify.content",
                     birthday.name,
