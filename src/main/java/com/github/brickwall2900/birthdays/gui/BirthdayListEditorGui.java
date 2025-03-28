@@ -22,9 +22,9 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 public class BirthdayListEditorGui extends JFrame {
     public static final String TITLE = text("editor.title");
     public static final Dimension SIZE = new Dimension(640, 720);
-    public static final int BORDER = 8;
+    private static List<? extends RowSorter.SortKey> lastSortKeys = new ArrayList<>();
 
-    private final BirthdayObjectTableModel tableModel;
+    private BirthdayObjectTableModel tableModel;
 
     public BirthdayListEditorGui(BirthdayObject[] objects) {
         setContentPane(UILoader.load(this, "/ui/birthdayList.xml", BUNDLE));
@@ -45,9 +45,13 @@ public class BirthdayListEditorGui extends JFrame {
         tableSorter.setSortsOnUpdates(true);
 
         // sort by names on startup
-        List<RowSorter.SortKey> sortKeys = new ArrayList<>();
-        sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
-        tableSorter.setSortKeys(sortKeys);
+        if (lastSortKeys != null) {
+            tableSorter.setSortKeys(lastSortKeys);
+        } else {
+            List<RowSorter.SortKey> sortKeys = new ArrayList<>();
+            sortKeys.add(new RowSorter.SortKey(0, SortOrder.ASCENDING));
+            tableSorter.setSortKeys(sortKeys);
+        }
 
         closeButton.addActionListener(this::onCloseButtonPressed);
         addButton.addActionListener(this::onAddButtonPressed);
@@ -59,7 +63,7 @@ public class BirthdayListEditorGui extends JFrame {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent e) {
-                Main.save();
+                SwingUtilities.invokeLater(Main::save);
             }
         });
 
@@ -88,6 +92,7 @@ public class BirthdayListEditorGui extends JFrame {
             tableModel.addBirthday(object);
             tableModel.fireTableDataChanged();
         }
+        editBox.destroy();
     }
 
     private BirthdayObject getSelected() {
@@ -126,6 +131,7 @@ public class BirthdayListEditorGui extends JFrame {
                 tableModel.setBirthday(selectedRow, object);
                 tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
             }
+            editBox.destroy();
         }
     }
 
@@ -134,6 +140,7 @@ public class BirthdayListEditorGui extends JFrame {
         notifierEditorGui.setVisible(true);
         // wait for user
         BirthdayNotifierConfig.globalConfig = notifierEditorGui.toConfig();
+        notifierEditorGui.destroy();
     }
 
     private void onListSelectionChanged(ListSelectionEvent e) {
@@ -146,7 +153,21 @@ public class BirthdayListEditorGui extends JFrame {
         return tableModel.getBirthdayObjects().toArray(new BirthdayObject[0]);
     }
 
-    public JLabel headerLabel;
+    public void destroy() {
+        Main.destroyContainer(this);
+        Main.destroyContainer(getContentPane());
+        lastSortKeys = new ArrayList<>(birthdayTable.getRowSorter().getSortKeys());
+        birthdayTable = null;
+        birthdayScrollPane = null;
+        addButton = null;
+        removeButton = null;
+        editButton = null;
+        configButton = null;
+        closeButton = null;
+        tableModel.destroy();
+        tableModel = null;
+    }
+
     public JScrollPane birthdayScrollPane;
     public JTable birthdayTable;
     public JButton addButton, removeButton, editButton, configButton, closeButton;

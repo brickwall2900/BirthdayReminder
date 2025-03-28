@@ -1,12 +1,12 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import org.httprpc.sierra.DatePicker;
 import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
-
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -18,7 +18,6 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class BirthdayEditorGui extends JDialog {
     public static final Dimension SIZE = new Dimension(400, 250);
-    public static final int BORDER = 8;
 
     private BirthdayObject birthday;
 
@@ -81,6 +80,7 @@ public class BirthdayEditorGui extends JDialog {
         BirthdayNotifierConfig.Config modifiedConfig = notifierEditorGui.toConfig();
         birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
         removeOverrideConfigButton.setEnabled(birthday.override != null);
+        notifierEditorGui.destroy();
     }
 
     private void onRemoveOverrideConfigButtonPressed(ActionEvent e) {
@@ -98,7 +98,19 @@ public class BirthdayEditorGui extends JDialog {
         return birthday = new BirthdayObject(name, enabled, date, !customMessage.isBlank() ? customMessage : null, birthday.override);
     }
 
-    public JLabel nameLabel, dateLabel, enabledLabel, customMessageLabel, overrideConfigLabel;
+    void destroy() {
+        Main.destroyContainer(this);
+        Main.destroyContainer(getContentPane());
+        nameField = null;
+        datePicker = null;
+        enabledCheckBox = null;
+        customMessageField = null;
+        overrideConfigButton = null;
+        removeOverrideConfigButton = null;
+        closeButton = null;
+        birthday = null;
+        getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+    }
 
     public JTextField nameField;
     public DatePicker datePicker;

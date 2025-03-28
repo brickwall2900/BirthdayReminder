@@ -3,7 +3,7 @@
 <!DOCTYPE column-panel SYSTEM "sierra.dtd">
 
 <column-panel padding="8" spacing="4">
-    <label name="headerLabel" text="editor.header" />
+    <label text="editor.header" />
     <scroll-pane name="birthdayScrollPane" weight="1" />
 
     <row-panel spacing="4">

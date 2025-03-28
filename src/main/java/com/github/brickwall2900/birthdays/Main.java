@@ -6,13 +6,13 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
+import dorkbox.systemTray.SystemTray;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
+import java.awt.event.*;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,7 +31,7 @@ public class Main {
     }
 
     private static BirthdayListEditorGui editorGui;
-    private static TrayIcon trayIcon;
+    private static SystemTray systemTray;
     private static InstanceLock lock;
 
     private static void swingContext() {
@@ -52,7 +52,11 @@ public class Main {
         editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             save();
+            editorGui = null;
             lock.unlock();
+            if (systemTray != null) {
+                systemTray.shutdown();
+            }
         }));
 
         buildTrayIcon();
@@ -66,25 +70,25 @@ public class Main {
     }
 
     public static void buildTrayIcon() {
-        SystemTray systemTray = SystemTray.getSystemTray();
-        trayIcon = new TrayIcon(IMAGE_ICON);
-        trayIcon.setImageAutoSize(true);
-        trayIcon.setToolTip(text("trayIcon.title"));
+        systemTray = SystemTray.get();
+        systemTray.setImage(IMAGE_ICON);
+        systemTray.setTooltip(text("trayIcon.title"));
 
-        PopupMenu popupMenu = new PopupMenu();
-        MenuItem openItem = new MenuItem(text("popup.open"), new MenuShortcut(KeyEvent.VK_O));
-        MenuItem exitItem = new MenuItem(text("popup.exit"), new MenuShortcut(KeyEvent.VK_E));
-        openItem.addActionListener(e -> editorGui.setVisible(true));
-        exitItem.addActionListener(e -> System.exit(0));
+        JMenu popupMenu = new JMenu();
+        JMenuItem openItem = new JMenuItem(text("popup.open"), KeyEvent.VK_O);
+        JMenuItem exitItem = new JMenuItem(text("popup.exit"), KeyEvent.VK_E);
+        openItem.addActionListener(e -> SwingUtilities.invokeLater(Main::openEditorGui));
+        exitItem.addActionListener(e -> SwingUtilities.invokeLater(() -> System.exit(0)));
         popupMenu.add(openItem);
         popupMenu.add(exitItem);
-        trayIcon.setPopupMenu(popupMenu);
+        systemTray.setMenu(popupMenu);
+    }
 
-        try {
-            systemTray.add(trayIcon);
-        } catch (AWTException e) {
-            throw new RuntimeException("Cannot add tray icon!");
+    private static void openEditorGui() {
+        if (editorGui == null) {
+            editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
         }
+        editorGui.setVisible(true);
     }
 
     public static void save() {
@@ -94,10 +98,16 @@ public class Main {
             BirthdaysConfig.save();
             BirthdayNotifierConfig.saveGlobalConfig();
             BirthdayNotifierConfig.saveApplicationConfig();
+
+            SwingUtilities.invokeLater(() -> {
+                editorGui.destroy();
+                editorGui = null;
+            });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, text("errors.cannotSave", e), text("errors.title"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
+        System.gc();
     }
 
     private static LocalDate today = LocalDate.now();
@@ -177,6 +187,7 @@ public class Main {
             clip.stop();
             clip.close();
         }
+        dialog.dispose();
     }
 
     private static Clip playSound(BirthdayObject birthday) {
@@ -208,6 +219,59 @@ public class Main {
         String text = daysBeforeBirthday > 1
                 ? text("notify.before.text.more", birthday.name, daysBeforeBirthday)
                 : text("notify.before.text.tomorrow", birthday.name);
-        trayIcon.displayMessage(text("notify.before.caption"), text, TrayIcon.MessageType.INFO);
+        displayMessage(text("notify.before.caption"), text);
+    }
+
+    private static void displayMessage(String caption, String text) {
+        JOptionPane optionPane = new JOptionPane(text, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
+        JDialog dialog = optionPane.createDialog(caption);
+        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+        dialog.setIconImage(IMAGE_ICON);
+        dialog.setAlwaysOnTop(true);
+        dialog.setVisible(true);
+        dialog.requestFocus();
+    }
+
+    public static void destroyContainer(Container container) {
+        if (container == null) return;
+
+        removeComponentListeners(container);
+        for (Component component : container.getComponents()) {
+            removeComponentListeners(component);
+            if (component instanceof Container) {
+                destroyContainer((Container) component);
+            }
+        }
+    }
+
+    private static void removeComponentListeners(Component component) {
+        if (component instanceof AbstractButton btn) {
+            for (ActionListener al : btn.getActionListeners()) {
+                btn.removeActionListener(al);
+            }
+        }
+        if (component instanceof Container c) {
+            for (ContainerListener cl : c.getContainerListeners()) {
+                c.removeContainerListener(cl);
+            }
+        }
+        for (MouseListener ml : component.getMouseListeners()) {
+            component.removeMouseListener(ml);
+        }
+        for (KeyListener kl : component.getKeyListeners()) {
+            component.removeKeyListener(kl);
+        }
+        for (FocusListener fl : component.getFocusListeners()) {
+            component.removeFocusListener(fl);
+        }
+        for (ComponentListener cl : component.getComponentListeners()) {
+            component.removeComponentListener(cl);
+        }
+        for (HierarchyListener hl : component.getHierarchyListeners()) {
+            component.removeHierarchyListener(hl);
+        }
+        for (InputMethodListener il : component.getInputMethodListeners()) {
+            component.removeInputMethodListener(il);
+        }
     }
 }

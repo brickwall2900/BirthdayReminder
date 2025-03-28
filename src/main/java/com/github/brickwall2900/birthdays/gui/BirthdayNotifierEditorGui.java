@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import org.httprpc.sierra.UILoader;
 
@@ -18,7 +19,6 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 public class BirthdayNotifierEditorGui extends JDialog {
     public static final String TITLE = text("notify.editor.dialog.title");
     public static final Dimension SIZE = new Dimension(400, 150);
-    public static final int BORDER = 8;
 
     public BirthdayNotifierEditorGui(Window owner) {
         super(owner);
@@ -81,7 +81,17 @@ public class BirthdayNotifierEditorGui extends JDialog {
         return new BirthdayNotifierConfig.Config(daysBeforeReminder, birthdaySound);
     }
 
-    public JLabel daysBeforeReminderLabel, birthdaySoundLabel;
+    void destroy() {
+        Main.destroyContainer(this);
+        Main.destroyContainer(getContentPane());
+        daysBeforeReminderSpinner = null;
+        birthdaySoundPath = null;
+        birthdaySoundChooser = null;
+        birthdaySoundChooserButton = null;
+        closeButton = null;
+        getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+    }
+
     public JSpinner daysBeforeReminderSpinner;
     public JTextField birthdaySoundPath;
     public JButton birthdaySoundChooserButton;

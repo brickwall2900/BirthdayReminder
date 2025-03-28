@@ -142,4 +142,9 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
             }
         }
     }
+
+    void destroy() {
+        birthdayObjects.clear();
+        birthdayObjects = null;
+    }
 }
