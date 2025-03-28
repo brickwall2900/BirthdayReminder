@@ -22,7 +22,7 @@ import static com.github.brickwall2900.birthdays.TranslatableText.text;
 public class BirthdayListEditorGui extends JFrame {
     public static final String TITLE = text("editor.title");
     public static final Dimension SIZE = new Dimension(640, 720);
-    private static List<? extends RowSorter.SortKey> lastSortKeys = new ArrayList<>();
+    private static List<? extends RowSorter.SortKey> lastSortKeys;
 
     private BirthdayObjectTableModel tableModel;
 
