@@ -110,7 +110,6 @@ public class Main {
             JOptionPane.showMessageDialog(null, text("errors.cannotSave", e), text("errors.title"), JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
-        System.gc();
     }
 
     private static LocalDate today = LocalDate.now();
