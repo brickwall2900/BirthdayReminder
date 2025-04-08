@@ -51,7 +51,7 @@ public class BirthdaysManager {
         long daysUntilBirthday = getDaysBeforeBirthday(birthday);
 
         // Determine if we should remind
-        return daysUntilBirthday <= daysBeforeReminder;
+        return daysBeforeReminder != 0 && daysUntilBirthday <= daysBeforeReminder;
     }
 
     public static long getDaysBeforeBirthday(BirthdayObject birthday) {

@@ -25,7 +25,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         setContentPane(UILoader.load(this, "/ui/birthdayNotifyEdit.xml", BUNDLE));
 
-        daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 1, 30, 1));
+        daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 0, 30, 1));
         closeButton.addActionListener(this::onCloseButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
