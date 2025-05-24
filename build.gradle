@@ -14,9 +14,9 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-    implementation 'org.httprpc:sierra:2.7.3'
-    implementation 'com.google.code.gson:gson:2.12.1'
-    implementation 'com.formdev:flatlaf:3.5.4'
+    implementation 'org.httprpc:sierra:2.7.5'
+    implementation 'com.google.code.gson:gson:2.13.1'
+    implementation 'com.formdev:flatlaf:3.6'
 
     implementation 'com.dorkbox:SystemTray:4.4'
 }
