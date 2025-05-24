@@ -20,6 +20,8 @@ public class BirthdayNotifierEditorGui extends JDialog {
     public static final String TITLE = text("notify.editor.dialog.title");
     public static final Dimension SIZE = new Dimension(400, 150);
 
+    private boolean canceled;
+
     public BirthdayNotifierEditorGui(Window owner) {
         super(owner);
 
@@ -27,6 +29,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 0, 30, 1));
         closeButton.addActionListener(this::onCloseButtonPressed);
+        cancelButton.addActionListener(this::onCancelButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
         daysBeforeReminderSpinner.setToolTipText(text("notify.editor.dialog.daysBeforeReminder.tip"));
@@ -51,10 +54,22 @@ public class BirthdayNotifierEditorGui extends JDialog {
     }
 
     private void onEscapePressed(ActionEvent e) {
-        dispose();
+        int option = JOptionPane.showConfirmDialog(this,
+                text("dialog.save.confirm"), TITLE, JOptionPane.YES_NO_CANCEL_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            dispose();
+        } else if (option == JOptionPane.NO_OPTION) {
+            canceled = true;
+            dispose();
+        }
     }
 
     private void onCloseButtonPressed(ActionEvent e) {
+        dispose();
+    }
+
+    private void onCancelButtonPressed(ActionEvent e) {
+        canceled = true;
         dispose();
     }
 
@@ -76,6 +91,9 @@ public class BirthdayNotifierEditorGui extends JDialog {
     }
 
     public BirthdayNotifierConfig.Config toConfig() {
+        if (canceled) {
+            return null;
+        }
         int daysBeforeReminder = (int) daysBeforeReminderSpinner.getValue();
         String birthdaySound = birthdaySoundPath.getText();
         return new BirthdayNotifierConfig.Config(daysBeforeReminder, birthdaySound);
@@ -88,6 +106,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         birthdaySoundPath = null;
         birthdaySoundChooser = null;
         birthdaySoundChooserButton = null;
+        cancelButton = null;
         closeButton = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
@@ -96,7 +115,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
     public JTextField birthdaySoundPath;
     public JButton birthdaySoundChooserButton;
     public JFileChooser birthdaySoundChooser;
-    public JButton closeButton;
+    public JButton cancelButton, closeButton;
 
     private static class WavFileFilter extends FileFilter {
 

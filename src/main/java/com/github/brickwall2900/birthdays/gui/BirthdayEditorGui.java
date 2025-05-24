@@ -20,6 +20,7 @@ public class BirthdayEditorGui extends JDialog {
     public static final Dimension SIZE = new Dimension(400, 250);
 
     private BirthdayObject birthday;
+    private boolean canceled;
 
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
         super(parent);
@@ -28,6 +29,7 @@ public class BirthdayEditorGui extends JDialog {
 
         enabledCheckBox.setSelected(true);
         closeButton.addActionListener(this::onCloseButtonPressed);
+        cancelButton.addActionListener(this::onCancelButtonPressed);
         overrideConfigButton.addActionListener(this::onOverrideConfigButtonPressed);
         removeOverrideConfigButton.addActionListener(this::onRemoveOverrideConfigButtonPressed);
         removeOverrideConfigButton.setEnabled(false);
@@ -65,10 +67,22 @@ public class BirthdayEditorGui extends JDialog {
     }
     
     private void onEscapePressed(ActionEvent e) {
-        dispose();
+        int option = JOptionPane.showConfirmDialog(this,
+                text("dialog.save.confirm"), getTitle(), JOptionPane.YES_NO_CANCEL_OPTION);
+        if (option == JOptionPane.YES_OPTION) {
+            dispose();
+        } else if (option == JOptionPane.NO_OPTION) {
+            canceled = true;
+            dispose();
+        }
     }
 
     private void onCloseButtonPressed(ActionEvent e) {
+        dispose();
+    }
+
+    private void onCancelButtonPressed(ActionEvent e) {
+        canceled = true;
         dispose();
     }
 
@@ -78,7 +92,9 @@ public class BirthdayEditorGui extends JDialog {
         notifierEditorGui.setVisible(true);
         // wait for user
         BirthdayNotifierConfig.Config modifiedConfig = notifierEditorGui.toConfig();
-        birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
+        if (modifiedConfig != null) {
+            birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
+        }
         removeOverrideConfigButton.setEnabled(birthday.override != null);
         notifierEditorGui.destroy();
     }
@@ -89,6 +105,9 @@ public class BirthdayEditorGui extends JDialog {
     }
 
     public BirthdayObject toBirthday() {
+        if (canceled) {
+            return null;
+        }
         String name = nameField.getText();
         if (name.isBlank()) return null;
         LocalDate date = datePicker.getDate();
@@ -107,6 +126,7 @@ public class BirthdayEditorGui extends JDialog {
         customMessageField = null;
         overrideConfigButton = null;
         removeOverrideConfigButton = null;
+        cancelButton = null;
         closeButton = null;
         birthday = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
@@ -118,5 +138,5 @@ public class BirthdayEditorGui extends JDialog {
     public JTextField customMessageField;
     public JButton overrideConfigButton, removeOverrideConfigButton;
 
-    public JButton closeButton;
+    public JButton cancelButton, closeButton;
 }

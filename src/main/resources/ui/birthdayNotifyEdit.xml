@@ -18,6 +18,7 @@
 
     <row-panel spacing="4">
         <spacer weight="1" />
-        <button name="closeButton" text="dialog.close" />
+        <button name="closeButton" text="dialog.save" />
+        <button name="cancelButton" text="dialog.cancel" />
     </row-panel>
 </column-panel>

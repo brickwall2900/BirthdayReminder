@@ -139,7 +139,10 @@ public class BirthdayListEditorGui extends JFrame {
         BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, BirthdayNotifierConfig.globalConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
-        BirthdayNotifierConfig.globalConfig = notifierEditorGui.toConfig();
+        BirthdayNotifierConfig.Config config = notifierEditorGui.toConfig();
+        if (config != null) {
+            BirthdayNotifierConfig.globalConfig = config;
+        }
         notifierEditorGui.destroy();
     }
 
