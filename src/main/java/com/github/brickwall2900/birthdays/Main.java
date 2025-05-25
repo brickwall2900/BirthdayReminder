@@ -24,7 +24,7 @@ import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class Main {
-    private static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
+    static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::swingContext);

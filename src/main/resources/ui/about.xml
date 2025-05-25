@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE column-panel SYSTEM "sierra.dtd">
+
+<column-panel padding="8" spacing="4">
+    <row-panel spacing="4" weight="1" >
+        <image-pane scaleMode="fill-height" image="/icon.png" padding="8" />
+        <column-panel spacing="4" weight="1">
+            <label name="header" text="about.header" />
+            <scroll-pane name="contentScrollPane" weight="1" />
+        </column-panel>
+    </row-panel>
+
+    <row-panel spacing="4">
+        <button name="licenseButton" text="about.license" />
+        <spacer weight="1" />
+        <button name="closeButton" text="dialog.close" />
+    </row-panel>
+</column-panel>

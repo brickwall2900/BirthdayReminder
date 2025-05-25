@@ -11,6 +11,7 @@
         <button name="removeButton" text="dialog.remove" />
         <button name="editButton" text="dialog.edit" />
         <button name="configButton" text="dialog.notify.config" />
+        <button name="helpButton" />
 
         <spacer weight="1" />
 
