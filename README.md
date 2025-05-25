@@ -14,6 +14,20 @@ someone's birthday!
 <img src="readme/editor.png" alt="the editor">
 
 ---
+## Building
+Java 21 is required for building.
+
+On your terminal, execute these commands:
+1. `git clone https://github.com/brickwall2900/BirthdayReminder.git`
+2. `cd BirthdayReminder`
+3. `./gradlew build`
+
+..or open this project in an IDE as a Gradle project.
+
+If you want to create an executable JAR: `./gradlew fatJar`. 
+The executable JAR should be at `./build/libs/BirthReminder-<version>.jar` 
+
+---
 ## Start on Computer Boot 🚀
 Currently, you need to manually set this application to auto-start 
 with your operating system. BirthdayReminder checks if it is someone's 
