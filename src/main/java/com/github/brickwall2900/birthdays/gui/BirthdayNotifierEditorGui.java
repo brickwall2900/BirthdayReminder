@@ -15,10 +15,12 @@ import java.util.Locale;
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
+import static com.github.brickwall2900.birthdays.gui.BirthdayEditorGui.newField;
 
 public class BirthdayNotifierEditorGui extends JDialog {
     public static final String TITLE = text("notify.editor.dialog.title");
-    public static final Dimension SIZE = new Dimension(400, 150);
+    public static final Dimension SIZE = new Dimension(450, 180);
+    public static final int FORM_INSETS = 2;
 
     private boolean canceled;
 
@@ -26,6 +28,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         super(owner);
 
         setContentPane(UILoader.load(this, "/ui/birthdayNotifyEdit.xml", BUNDLE));
+        initForm();
 
         daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 0, 30, 1));
         closeButton.addActionListener(this::onCloseButtonPressed);
@@ -51,6 +54,17 @@ public class BirthdayNotifierEditorGui extends JDialog {
 
         daysBeforeReminderSpinner.setValue(config.daysBeforeReminder);
         birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath : null);
+    }
+
+    private void initForm() {
+        JPanel contentPane = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+        c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
+        newField(text("notify.editor.dialog.daysBeforeReminder"), contentPane, daysBeforeReminderSpinner = new JSpinner(), null, c);
+        newField(text("notify.editor.dialog.birthdaySoundLabel"), contentPane, birthdaySoundPath = new JTextField(), birthdaySoundChooserButton = new JButton(text("dialog.open")), c);
+
+        formScrollPane.setViewportView(contentPane);
+        formScrollPane.setBorder(null);
     }
 
     private void onEscapePressed(ActionEvent e) {
@@ -108,9 +122,11 @@ public class BirthdayNotifierEditorGui extends JDialog {
         birthdaySoundChooserButton = null;
         cancelButton = null;
         closeButton = null;
+        formScrollPane = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 
+    public JScrollPane formScrollPane;
     public JSpinner daysBeforeReminderSpinner;
     public JTextField birthdaySoundPath;
     public JButton birthdaySoundChooserButton;

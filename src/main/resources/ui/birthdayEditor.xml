@@ -3,31 +3,7 @@
 <!DOCTYPE column-panel SYSTEM "sierra.dtd">
 
 <column-panel padding="8" spacing="4">
-    <row-panel spacing="4">
-        <label text="editor.dialog.fields.name" />
-        <text-field name="nameField" weight="1" />
-    </row-panel>
-
-    <row-panel spacing="4">
-        <label text="editor.dialog.fields.date" />
-        <date-picker name="datePicker" weight="1" />
-    </row-panel>
-
-    <row-panel spacing="4">
-        <label text="editor.dialog.fields.enabled" />
-        <check-box name="enabledCheckBox" weight="1" />
-    </row-panel>
-
-    <row-panel spacing="4">
-        <label text="editor.dialog.fields.customMessage" />
-        <text-field name="customMessageField" weight="1" />
-    </row-panel>
-
-    <row-panel spacing="4">
-        <label text="editor.dialog.fields.override" />
-        <button name="overrideConfigButton" text="dialog.edit" weight="1" />
-        <button name="removeOverrideConfigButton" text="dialog.remove" />
-    </row-panel>
+    <scroll-pane name="formScrollPane" />
 
     <spacer weight="1" />
 
