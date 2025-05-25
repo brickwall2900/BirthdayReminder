@@ -1,6 +1,6 @@
 package com.github.brickwall2900.birthdays;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
@@ -14,11 +14,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.Properties;
 
 import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
@@ -33,15 +36,22 @@ public class Main {
     private static BirthdayListEditorGui editorGui;
     private static SystemTray systemTray;
     private static InstanceLock lock;
+    private static String version;
 
     private static void swingContext() {
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 2);
         BirthdaysManager.loadEverything();
-        if (BirthdayNotifierConfig.applicationConfig.darkMode) {
-            FlatDarculaLaf.setup();
-        } else {
-            FlatLightLaf.setup();
+        try (InputStream stream = Main.class.getResourceAsStream("/version.properties")) {
+            Properties versionProperties = new Properties();
+            versionProperties.load(stream);
+            version = versionProperties.getProperty("app.version");
+        } catch (IOException e) {
+            System.err.println("Version cannot be retrieved!");
+            e.printStackTrace();
+            version = "Unknown";
         }
+        System.out.println("Version: " + version);
+        setDarkMode(BirthdayNotifierConfig.applicationConfig.darkMode);
 
         lock = new InstanceLock(UNIQUE_APP_ID);
         if (!lock.lock()) {
@@ -70,12 +80,14 @@ public class Main {
         System.exit(0);
     }
 
+    private static JMenu popupMenu;
+
     public static void buildTrayIcon() {
-        systemTray = SystemTray.get();
+        systemTray = SystemTray.get(UNIQUE_APP_ID);
         systemTray.setImage(IMAGE_ICON);
         systemTray.setTooltip(text("trayIcon.title"));
 
-        JMenu popupMenu = new JMenu();
+        popupMenu = new JMenu();
         JMenuItem openItem = new JMenuItem(text("popup.open"), KeyEvent.VK_O);
         JMenuItem exitItem = new JMenuItem(text("popup.exit"), KeyEvent.VK_E);
         openItem.addActionListener(e -> SwingUtilities.invokeLater(Main::openEditorGui));
@@ -86,6 +98,12 @@ public class Main {
     }
 
     private static void openEditorGui() {
+        if (systemTray != null) {
+            systemTray.shutdown();
+            systemTray = null;
+            Main.destroyContainer(popupMenu);
+            Main.removeComponentListeners(popupMenu);
+        }
         if (editorGui == null) {
             editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
         }
@@ -105,6 +123,7 @@ public class Main {
             SwingUtilities.invokeLater(() -> {
                 editorGui.destroy();
                 editorGui = null;
+                buildTrayIcon();
             });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null, text("errors.cannotSave", e), text("errors.title"), JOptionPane.ERROR_MESSAGE);
@@ -233,6 +252,16 @@ public class Main {
         dialog.requestFocus();
     }
 
+    public static void setDarkMode(boolean toggle) {
+        if (toggle) {
+            FlatDarkLaf.setup();
+        } else {
+            FlatLightLaf.setup();
+        }
+        Arrays.stream(Window.getWindows()).forEach(SwingUtilities::updateComponentTreeUI);
+        BirthdayNotifierConfig.applicationConfig.darkMode = toggle;
+    }
+
     public static void destroyContainer(Container container) {
         if (container == null) return;
 
@@ -274,5 +303,9 @@ public class Main {
         for (InputMethodListener il : component.getInputMethodListeners()) {
             component.removeInputMethodListener(il);
         }
+    }
+
+    public static String getVersion() {
+        return version;
     }
 }

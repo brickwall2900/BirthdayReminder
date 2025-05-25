@@ -13,6 +13,7 @@
 
     <row-panel spacing="4">
         <button name="licenseButton" text="about.license" />
+        <check-box name="darkModeCheckbox" text="about.darkMode" />
         <spacer weight="1" />
         <button name="closeButton" text="dialog.close" />
     </row-panel>

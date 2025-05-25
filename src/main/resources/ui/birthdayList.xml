@@ -11,10 +11,10 @@
         <button name="removeButton" text="dialog.remove" />
         <button name="editButton" text="dialog.edit" />
         <button name="configButton" text="dialog.notify.config" />
-        <button name="helpButton" />
 
         <spacer weight="1" />
 
+        <button name="aboutButton" text="about.header" />
         <button name="closeButton" text="dialog.close" />
     </row-panel>
 </column-panel>

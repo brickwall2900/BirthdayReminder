@@ -44,8 +44,6 @@ public class BirthdayListEditorGui extends JFrame {
         birthdayTable.setRowSorter(tableSorter);
         tableSorter.setSortsOnUpdates(true);
 
-        helpButton.putClientProperty("JButton.buttonType", "help");
-
         // sort by names on startup
         if (lastSortKeys != null) {
             tableSorter.setSortKeys(lastSortKeys);
@@ -61,7 +59,7 @@ public class BirthdayListEditorGui extends JFrame {
         editButton.addActionListener(this::onEditButtonPressed);
         configButton.addActionListener(this::onConfigButtonPressed);
         birthdayTable.getSelectionModel().addListSelectionListener(this::onListSelectionChanged);
-        helpButton.addActionListener(this::onHelpButtonPressed);
+        aboutButton.addActionListener(this::onHelpButtonPressed);
 
         addWindowListener(new WindowAdapter() {
             @Override
@@ -176,7 +174,7 @@ public class BirthdayListEditorGui extends JFrame {
         editButton = null;
         configButton = null;
         closeButton = null;
-        helpButton = null;
+        aboutButton = null;
         tableModel.destroy();
         tableModel = null;
     }
@@ -184,5 +182,5 @@ public class BirthdayListEditorGui extends JFrame {
     public JScrollPane birthdayScrollPane;
     public JTable birthdayTable;
     public JButton addButton, removeButton, editButton, configButton, closeButton;
-    public JButton helpButton;
+    public JButton aboutButton;
 }
