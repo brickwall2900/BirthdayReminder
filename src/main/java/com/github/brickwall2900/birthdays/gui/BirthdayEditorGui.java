@@ -11,21 +11,48 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
+import java.time.chrono.Chronology;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.DateTimeParseException;
+import java.time.format.FormatStyle;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
-public class BirthdayEditorGui extends JDialog {
+public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
     public static final Dimension SIZE = new Dimension(450, 270);
     public static final int FORM_INSETS = 2;
 
+    public final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(
+            DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                    FormatStyle.MEDIUM, null, Chronology.ofLocale(getLocale()), getLocale()));
+
+    private static final String DATES_PATTERNS;
+
+    static {
+        List<String> patterns = ProperInputVerifier.PATTERNS;
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append('\n');
+        for (int i = 0; i < patterns.size(); i++) {
+            String pattern = patterns.get(i);
+            stringBuilder.append(pattern);
+            if (i <= patterns.size() - 2) {
+                stringBuilder.append(',').append('\n');
+            }
+        }
+        DATES_PATTERNS = stringBuilder.toString();
+    }
+
     private BirthdayObject birthday;
-    private boolean canceled;
 
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
-        super(parent);
+        super(parent, text("editor.dialog.title", "???"));
 
         setContentPane(UILoader.load(this, "/ui/birthdayEditor.xml", BUNDLE));
         initForm();
@@ -38,25 +65,22 @@ public class BirthdayEditorGui extends JDialog {
         removeOverrideConfigButton.setEnabled(false);
 
         nameField.setToolTipText(text("editor.dialog.fields.name.tip"));
-        datePicker.setToolTipText(text("editor.dialog.fields.date.tip"));
+        datePicker.setToolTipText(text("editor.dialog.fields.date.tip", DATES_PATTERNS));
         enabledCheckBox.setToolTipText(text("editor.dialog.fields.enabled.tip"));
         customMessageField.setToolTipText(text("editor.dialog.fields.customMessage.tip"));
         overrideConfigButton.setToolTipText(text("editor.dialog.fields.override.tip"));
 
+        datePicker.setInputVerifier(new ProperInputVerifier());
+
         this.birthday = new BirthdayObject();
 
-        getRootPane().registerKeyboardAction(this::onEscapePressed,
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
         setIconImage(IMAGE_ICON);
-        setTitle(text("editor.dialog.title", "???"));
         setSize(SIZE);
         setLocationRelativeTo(parent);
         setModalityType(ModalityType.APPLICATION_MODAL);
     }
 
-    private void initForm() {
+    void initForm() {
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
@@ -99,31 +123,12 @@ public class BirthdayEditorGui extends JDialog {
 
         setTitle(text("editor.dialog.title", birthday.name));
         nameField.setText(birthday.name);
-        datePicker.setDate(birthday.date);
+        datePicker.setDate(birthday.date); // set date internally
+        datePicker.setText(dateFormatter.format(birthday.date)); // set date in text field
         enabledCheckBox.setSelected(birthday.enabled);
         customMessageField.setText(birthday.customMessage);
 
         removeOverrideConfigButton.setEnabled(birthday.override != null);
-    }
-    
-    private void onEscapePressed(ActionEvent e) {
-        int option = JOptionPane.showConfirmDialog(this,
-                text("dialog.save.confirm"), getTitle(), JOptionPane.YES_NO_CANCEL_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            dispose();
-        } else if (option == JOptionPane.NO_OPTION) {
-            canceled = true;
-            dispose();
-        }
-    }
-
-    private void onCloseButtonPressed(ActionEvent e) {
-        dispose();
-    }
-
-    private void onCancelButtonPressed(ActionEvent e) {
-        canceled = true;
-        dispose();
     }
 
     private void onOverrideConfigButtonPressed(ActionEvent e) {
@@ -131,7 +136,7 @@ public class BirthdayEditorGui extends JDialog {
         BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, birthday.override != null ? birthday.override : defaultConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
-        BirthdayNotifierConfig.Config modifiedConfig = notifierEditorGui.toConfig();
+        BirthdayNotifierConfig.Config modifiedConfig = notifierEditorGui.getResult();
         if (modifiedConfig != null) {
             birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
         }
@@ -144,7 +149,7 @@ public class BirthdayEditorGui extends JDialog {
         removeOverrideConfigButton.setEnabled(false);
     }
 
-    public BirthdayObject toBirthday() {
+    public BirthdayObject getResult() {
         if (canceled) {
             return null;
         }
@@ -171,6 +176,70 @@ public class BirthdayEditorGui extends JDialog {
         birthday = null;
         formScrollPane = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+    }
+
+    class ProperInputVerifier extends InputVerifier {
+        private static final List<String> PATTERNS;
+        private static final List<DateTimeFormatter> FORMATTERS;
+
+        static {
+            PATTERNS = new ArrayList<>();
+            FORMATTERS = new ArrayList<>();
+            for (FormatStyle formatStyle : FormatStyle.values()) {
+                String pattern = DateTimeFormatterBuilder.getLocalizedDateTimePattern(
+                        formatStyle, null, Chronology.ofLocale(Locale.getDefault()), Locale.getDefault());
+                PATTERNS.add(pattern);
+                DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(pattern);
+                FORMATTERS.add(dateFormatter);
+            }
+        }
+
+        private boolean validate(LocalDate date, DatePicker datePicker) {
+            LocalDate minimumDate = datePicker.getMinimumDate();
+            LocalDate maximumDate = datePicker.getMaximumDate();
+            return (minimumDate == null || !date.isBefore(minimumDate))
+                    && (maximumDate == null || !date.isAfter(maximumDate));
+        }
+
+        @Override
+        public boolean verify(JComponent input) {
+            if (input instanceof DatePicker picker) {
+                LocalDate pickerDate = picker.getDate();
+                System.out.println("PickerDate " + pickerDate);
+                try {
+                    LocalDate date = null;
+                    for (DateTimeFormatter formatter : FORMATTERS) {
+                        try {
+                            date = LocalDate.parse(picker.getText(), formatter);
+                            break;
+                        } catch (DateTimeParseException ignored) {
+                        }
+                    }
+                    System.out.println("Date " + date);
+                    if (date == null) {
+                        throw new IllegalStateException();
+                    }
+
+                    if (date.equals(pickerDate)) {
+                        return true;
+                    }
+
+                    if (!validate(date, picker)) {
+                        picker.setText(dateFormatter.format(pickerDate));
+                        picker.selectAll();
+
+                        return false;
+                    }
+
+                    datePicker.setDate(date); // This sets the internal date
+                    datePicker.setText(dateFormatter.format(date)); // This sets the date shown on the field
+                } catch (IllegalStateException exception) {
+                    datePicker.setText(dateFormatter.format(pickerDate));
+                }
+
+            }
+            return true;
+        }
     }
 
     public JScrollPane formScrollPane;

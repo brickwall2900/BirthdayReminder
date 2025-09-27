@@ -6,7 +6,6 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -50,9 +49,8 @@ public class BirthdayNotifierConfig {
     }
 
     public static void saveGlobalConfig() throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(NOTIFIER_CONFIG_PATH)) {
-            gson.toJson(globalConfig, writer);
-        }
+        String output = gson.toJson(globalConfig);
+        Files.writeString(NOTIFIER_CONFIG_PATH, output);
     }
 
     public static void loadApplicationConfig() throws IOException {
@@ -66,9 +64,8 @@ public class BirthdayNotifierConfig {
     }
 
     public static void saveApplicationConfig() throws IOException {
-        try (BufferedWriter writer = Files.newBufferedWriter(APP_CONFIG_PATH)) {
-            gson.toJson(applicationConfig, writer);
-        }
+        String output = gson.toJson(applicationConfig);
+        Files.writeString(APP_CONFIG_PATH, output);
     }
 
     public static class Config {

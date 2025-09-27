@@ -15,17 +15,14 @@ import java.util.Locale;
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
 import static com.github.brickwall2900.birthdays.TranslatableText.text;
-import static com.github.brickwall2900.birthdays.gui.BirthdayEditorGui.newField;
 
-public class BirthdayNotifierEditorGui extends JDialog {
+public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig.Config> {
     public static final String TITLE = text("notify.editor.dialog.title");
     public static final Dimension SIZE = new Dimension(450, 180);
     public static final int FORM_INSETS = 2;
 
-    private boolean canceled;
-
     public BirthdayNotifierEditorGui(Window owner) {
-        super(owner);
+        super(owner, TITLE);
 
         setContentPane(UILoader.load(this, "/ui/birthdayNotifyEdit.xml", BUNDLE));
         initForm();
@@ -43,7 +40,6 @@ public class BirthdayNotifierEditorGui extends JDialog {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setIconImage(IMAGE_ICON);
-        setTitle(TITLE);
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLocationRelativeTo(owner);
@@ -56,7 +52,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath : null);
     }
 
-    private void initForm() {
+    void initForm() {
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
@@ -78,15 +74,6 @@ public class BirthdayNotifierEditorGui extends JDialog {
         }
     }
 
-    private void onCloseButtonPressed(ActionEvent e) {
-        dispose();
-    }
-
-    private void onCancelButtonPressed(ActionEvent e) {
-        canceled = true;
-        dispose();
-    }
-
     private void onChooseButtonPressed(ActionEvent e) {
         if (birthdaySoundChooser == null) {
             birthdaySoundChooser = new JFileChooser(System.getProperty("user.dir"));
@@ -104,7 +91,7 @@ public class BirthdayNotifierEditorGui extends JDialog {
         }
     }
 
-    public BirthdayNotifierConfig.Config toConfig() {
+    public BirthdayNotifierConfig.Config getResult() {
         if (canceled) {
             return null;
         }

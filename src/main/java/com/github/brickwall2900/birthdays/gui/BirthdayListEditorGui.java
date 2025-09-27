@@ -8,9 +8,7 @@ import org.httprpc.sierra.UILoader;
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
+import java.awt.event.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,6 +24,9 @@ public class BirthdayListEditorGui extends JFrame {
 
     private BirthdayObjectTableModel tableModel;
 
+    private String tableKeyTyped;
+    private long tableKeyTypedTimestamp;
+
     public BirthdayListEditorGui(BirthdayObject[] objects) {
         setContentPane(UILoader.load(this, "/ui/birthdayList.xml", BUNDLE));
 
@@ -39,6 +40,13 @@ public class BirthdayListEditorGui extends JFrame {
         birthdayTable.setColumnSelectionAllowed(false);
         birthdayTable.setRowSelectionAllowed(true);
         birthdayTable.getTableHeader().setReorderingAllowed(false);
+
+        birthdayTable.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                onKeyTypedTable(e);
+            }
+        });
 
         BirthdayObjectTableModel.BirthdayTableSorter tableSorter = new BirthdayObjectTableModel.BirthdayTableSorter(tableModel);
         birthdayTable.setRowSorter(tableSorter);
@@ -71,6 +79,15 @@ public class BirthdayListEditorGui extends JFrame {
         removeButton.setEnabled(false);
         editButton.setEnabled(false);
 
+        popupMenu = new JPopupMenu();
+        JMenuItem editMenuItem = new JMenuItem(text("dialog.edit"), KeyEvent.VK_E);
+        JMenuItem removeMenuItem = new JMenuItem(text("dialog.remove"), KeyEvent.VK_R);
+        editMenuItem.addActionListener(this::onEditButtonPressed);
+        removeMenuItem.addActionListener(this::onRemoveButtonPressed);
+        popupMenu.add(editMenuItem);
+        popupMenu.add(removeMenuItem);
+        birthdayTable.setComponentPopupMenu(popupMenu);
+
         setIconImage(IMAGE_ICON);
         setTitle(TITLE);
         setSize(SIZE);
@@ -84,11 +101,37 @@ public class BirthdayListEditorGui extends JFrame {
         dispatchEvent(new WindowEvent(this, WindowEvent.WINDOW_CLOSING));
     }
 
+    // why won't this work out of the box?
+    private void onKeyTypedTable(KeyEvent e) {
+        if (birthdayTable.isEditing()) {
+            return; // don’t interfere with editing
+        }
+
+        if ((System.currentTimeMillis() - tableKeyTypedTimestamp) >= 500) {
+            tableKeyTyped = "";
+        }
+
+        tableKeyTyped += Character.toLowerCase(e.getKeyChar());
+
+        for (int i = 0; i < birthdayTable.getRowCount(); i++) {
+            int modelIndex = birthdayTable.convertRowIndexToModel(i);
+            BirthdayObject object = tableModel.getBirthdayObjects().get(modelIndex);
+
+            if (object.name.toLowerCase().startsWith(tableKeyTyped)) {
+                birthdayTable.getSelectionModel().setSelectionInterval(i, i);
+                birthdayTable.scrollRectToVisible(birthdayTable.getCellRect(i, 0, true));
+                break;
+            }
+        }
+
+        tableKeyTypedTimestamp = System.currentTimeMillis();
+    }
+
     private void onAddButtonPressed(ActionEvent e) {
         BirthdayEditorGui editBox = new BirthdayEditorGui(this);
         editBox.setVisible(true);
         // wait for user
-        BirthdayObject object = editBox.toBirthday();
+        BirthdayObject object = editBox.getResult();
         if (object != null) {
             tableModel.addBirthday(object);
             tableModel.fireTableDataChanged();
@@ -127,7 +170,7 @@ public class BirthdayListEditorGui extends JFrame {
             editBox.setVisible(true);
             // wait for user
 
-            BirthdayObject object = editBox.toBirthday();
+            BirthdayObject object = editBox.getResult();
             if (object != null) {
                 tableModel.setBirthday(selectedRow, object);
                 tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
@@ -140,7 +183,7 @@ public class BirthdayListEditorGui extends JFrame {
         BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, BirthdayNotifierConfig.globalConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
-        BirthdayNotifierConfig.Config config = notifierEditorGui.toConfig();
+        BirthdayNotifierConfig.Config config = notifierEditorGui.getResult();
         if (config != null) {
             BirthdayNotifierConfig.globalConfig = config;
         }
@@ -166,7 +209,9 @@ public class BirthdayListEditorGui extends JFrame {
     public void destroy() {
         Main.destroyContainer(this);
         Main.destroyContainer(getContentPane());
+        Main.destroyContainer(popupMenu);
         lastSortKeys = new ArrayList<>(birthdayTable.getRowSorter().getSortKeys());
+        popupMenu = null;
         birthdayTable = null;
         birthdayScrollPane = null;
         addButton = null;
@@ -178,6 +223,8 @@ public class BirthdayListEditorGui extends JFrame {
         tableModel.destroy();
         tableModel = null;
     }
+
+    public JPopupMenu popupMenu;
 
     public JScrollPane birthdayScrollPane;
     public JTable birthdayTable;

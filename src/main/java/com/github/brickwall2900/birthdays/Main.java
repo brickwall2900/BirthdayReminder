@@ -45,13 +45,16 @@ public class Main {
             Properties versionProperties = new Properties();
             versionProperties.load(stream);
             version = versionProperties.getProperty("app.version");
-        } catch (IOException e) {
+        } catch (IOException | NullPointerException e) {
             System.err.println("Version cannot be retrieved!");
             e.printStackTrace();
             version = "Unknown";
         }
         System.out.println("Version: " + version);
         setDarkMode(BirthdayNotifierConfig.applicationConfig.darkMode);
+
+        ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
+        toolTipManager.setDismissDelay(15 * 1000);
 
         lock = new InstanceLock(UNIQUE_APP_ID);
         if (!lock.lock()) {
