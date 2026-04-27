@@ -47,16 +47,21 @@ public abstract class BaseDialog<T> extends JDialog {
 
     abstract void initForm();
     public abstract T getResult();
+    public abstract boolean isDirty();
 
     private void onEscapePressed(ActionEvent e) {
-        int option = JOptionPane.showConfirmDialog(this,
-                BUNDLE.getString("dialog.save.confirm"),
-                getTitle(),
-                JOptionPane.YES_NO_CANCEL_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            dispose();
-        } else if (option == JOptionPane.NO_OPTION) {
-            canceled = true;
+        if (isDirty()) {
+            int option = JOptionPane.showConfirmDialog(this,
+                    BUNDLE.getString("dialog.save.confirm"),
+                    getTitle(),
+                    JOptionPane.YES_NO_CANCEL_OPTION);
+            if (option == JOptionPane.YES_OPTION) {
+                dispose();
+            } else if (option == JOptionPane.NO_OPTION) {
+                canceled = true;
+                dispose();
+            }
+        } else {
             dispose();
         }
     }

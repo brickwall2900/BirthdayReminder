@@ -177,10 +177,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         removeOverrideConfigButton.setEnabled(false);
     }
 
-    public BirthdayObject getResult() {
-        if (canceled) {
-            return null;
-        }
+    private BirthdayObject makeBirthdayObject() {
         String name = nameField.getText();
         if (name.isBlank()) return null;
         LocalDate date = datePicker.getDate();
@@ -192,6 +189,19 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
                 date,
                 !customMessage.isBlank() ? customMessage : null,
                 notifierOverride);
+    }
+
+    public BirthdayObject getResult() {
+        if (canceled || isDirty()) {
+            return null;
+        }
+
+        return makeBirthdayObject();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return !Objects.equals(birthday, makeBirthdayObject());
     }
 
     void destroy() {

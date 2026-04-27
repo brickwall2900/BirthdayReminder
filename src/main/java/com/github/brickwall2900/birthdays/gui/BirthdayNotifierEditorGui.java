@@ -40,21 +40,21 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         daysBeforeReminderSpinner.setToolTipText(BUNDLE.getString("notify.editor.dialog.daysBeforeReminder.tip"));
         birthdaySoundPath.setToolTipText(BUNDLE.getString("notify.editor.dialog.birthdaySound.tip"));
 
-        getRootPane().registerKeyboardAction(this::onEscapePressed,
-                KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
-                JComponent.WHEN_IN_FOCUSED_WINDOW);
-
         setIconImage(IMAGE_ICON);
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLocationRelativeTo(owner);
     }
 
+    private static final long NO_VALUE = ((long) Integer.MAX_VALUE) + 1;
+    private long configHashCode = NO_VALUE;
+
     public BirthdayNotifierEditorGui(Window owner, BirthdayNotifierConfig config) {
         this(owner);
 
         daysBeforeReminderSpinner.setValue(config.daysBeforeReminder);
         birthdaySoundPath.setText(config.birthdaySoundPath != null ? config.birthdaySoundPath : null);
+        configHashCode = config.hashCode();
     }
 
     void initForm() {
@@ -76,17 +76,6 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         formScrollPane.setBorder(null);
     }
 
-    private void onEscapePressed(ActionEvent e) {
-        int option = JOptionPane.showConfirmDialog(this,
-                BUNDLE.getString("dialog.save.confirm"), TITLE, JOptionPane.YES_NO_CANCEL_OPTION);
-        if (option == JOptionPane.YES_OPTION) {
-            dispose();
-        } else if (option == JOptionPane.NO_OPTION) {
-            canceled = true;
-            dispose();
-        }
-    }
-
     private void onChooseButtonPressed(ActionEvent e) {
         if (birthdaySoundChooser == null) {
             birthdaySoundChooser = new JFileChooser(System.getProperty("user.dir"));
@@ -104,13 +93,23 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         }
     }
 
-    public BirthdayNotifierConfig getResult() {
-        if (canceled) {
-            return null;
-        }
+    private BirthdayNotifierConfig makeConfig() {
         int daysBeforeReminder = (int) daysBeforeReminderSpinner.getValue();
         String birthdaySound = birthdaySoundPath.getText();
         return new BirthdayNotifierConfig(daysBeforeReminder, birthdaySound);
+    }
+
+    public BirthdayNotifierConfig getResult() {
+        if (canceled || !isDirty()) {
+            return null;
+        }
+
+        return makeConfig();
+    }
+
+    @Override
+    public boolean isDirty() {
+        return configHashCode != NO_VALUE && makeConfig().hashCode() != configHashCode;
     }
 
     void destroy() {
