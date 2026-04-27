@@ -69,7 +69,7 @@ public class InstanceLock {
      *
      * @return {@code true} if the lock is successfully acquired, {@code false} otherwise.
      */
-    public boolean lock() {
+    public boolean lock() throws LockOperationFailedException {
         try {
             fileChannel = FileChannel.open(lockPath, StandardOpenOption.APPEND, StandardOpenOption.CREATE);
             fileLock = fileChannel.tryLock();
@@ -78,9 +78,7 @@ public class InstanceLock {
                 return false;
             }
         } catch (Exception e) {
-            System.err.println("Internal lock exception");
-            e.printStackTrace();
-            return false;
+            throw new LockOperationFailedException(LockOperationFailedException.LockState.LOCKING, e);
         }
         isLocked = true;
         return true;
@@ -91,16 +89,14 @@ public class InstanceLock {
      *
      * @return Returns {@code true} if the lock is successfully released, {@code false} otherwise.
      */
-    public boolean unlock() {
+    public boolean unlock() throws LockOperationFailedException {
         try {
             if (fileLock != null) {
                 fileLock.close();
             }
             fileChannel.close();
         } catch (Exception e) {
-            System.err.println("Internal lock exception");
-            e.printStackTrace();
-            return false;
+            throw new LockOperationFailedException(LockOperationFailedException.LockState.UNLOCKING, e);
         }
         isLocked = false;
         return true;
@@ -111,5 +107,17 @@ public class InstanceLock {
      */
     public boolean isLocked() {
         return isLocked;
+    }
+
+    /// This exception would get thrown if there's an exception thrown during a lock operation.
+    public static class LockOperationFailedException extends IllegalStateException {
+        public LockOperationFailedException(LockState state, Throwable e) {
+            super("Lock operation failed on " + state + " state", e);
+        }
+
+        /// The lock state during the operation, whether during locking or unlocking.
+        public enum LockState {
+            LOCKING, UNLOCKING;
+        }
     }
 }
