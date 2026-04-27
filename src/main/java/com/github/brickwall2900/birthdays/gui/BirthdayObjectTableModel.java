@@ -8,10 +8,10 @@ import javax.swing.table.TableRowSorter;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
+import java.util.ResourceBundle;
 
 public class BirthdayObjectTableModel extends AbstractTableModel {
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BirthdayObjectTableModel.class.getName());
     public static final int COL_NAMES = 0;
     public static final int COL_DATES = 1;
     public static final int COL_AGE = 2;
@@ -72,7 +72,7 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
                 case COL_DATES -> object.date;
                 case COL_AGE -> BirthdaysManager.getAgeInYears(object);
                 case COL_DAYS -> BirthdaysManager.getDaysBeforeBirthday(object);
-                default -> text("editor.table.unknown");
+                default -> BUNDLE.getString("editor.table.unknown");
             };
         } else {
             return null;
@@ -82,10 +82,10 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
     @Override
     public String getColumnName(int column) {
         return switch (column) {
-            case COL_NAMES -> text("editor.table.column.names");
-            case COL_DATES -> text("editor.table.column.dates");
-            case COL_AGE -> text("editor.table.column.age");
-            case COL_DAYS -> text("editor.table.column.days");
+            case COL_NAMES -> BUNDLE.getString("editor.table.column.names");
+            case COL_DATES -> BUNDLE.getString("editor.table.column.dates");
+            case COL_AGE -> BUNDLE.getString("editor.table.column.age");
+            case COL_DAYS -> BUNDLE.getString("editor.table.column.days");
             default -> super.getColumnName(column);
         };
     }

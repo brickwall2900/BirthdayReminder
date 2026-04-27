@@ -4,9 +4,7 @@ import javax.swing.*;
 
 import java.awt.*;
 
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
-
-public class EnumToTextListCellRenderer<T extends Enum<?>> extends DefaultListCellRenderer {
+public abstract class EnumToTextListCellRenderer<T extends Enum<?>> extends DefaultListCellRenderer {
     private final String key;
 
     public EnumToTextListCellRenderer(String key) {
@@ -17,8 +15,10 @@ public class EnumToTextListCellRenderer<T extends Enum<?>> extends DefaultListCe
     public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
         JLabel label = (JLabel) super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
         if (value != null) {
-            label.setText(text(key + '.' + value));
+            label.setText(getText(key + '.' + value));
         }
         return label;
     }
+
+    public abstract String getText(String key);
 }

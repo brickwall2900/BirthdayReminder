@@ -5,12 +5,14 @@ import com.formdev.flatlaf.FlatLightLaf;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
+import com.github.brickwall2900.birthdays.gui.BaseDialog;
 import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
 import dorkbox.systemTray.SystemTray;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
@@ -18,16 +20,12 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.Arrays;
+import java.util.*;
 import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-
-import static com.github.brickwall2900.birthdays.TranslatableText.getArray;
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class Main {
-    static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(Main.class.getName());
+    protected static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::swingContext);
@@ -51,7 +49,10 @@ public class Main {
 
         lock = new InstanceLock(UNIQUE_APP_ID);
         if (!lock.lock()) {
-            JOptionPane.showMessageDialog(null, text("errors.instanceAlreadyRunning"), text("trayIcon.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    BUNDLE.getString("errors.instanceAlreadyRunning"),
+                    BUNDLE.getString("trayIcon.title"),
+                    JOptionPane.ERROR_MESSAGE);
             System.exit(0);
         }
 
@@ -93,11 +94,11 @@ public class Main {
     public static void buildTrayIcon() {
         systemTray = SystemTray.get(UNIQUE_APP_ID);
         systemTray.setImage(IMAGE_ICON);
-        systemTray.setTooltip(text("trayIcon.title"));
+        systemTray.setTooltip(BUNDLE.getString("trayIcon.title"));
 
         popupMenu = new JMenu();
-        JMenuItem openItem = new JMenuItem(text("popup.open"), KeyEvent.VK_O);
-        JMenuItem exitItem = new JMenuItem(text("popup.exit"), KeyEvent.VK_E);
+        JMenuItem openItem = new JMenuItem(BUNDLE.getString("popup.open"), KeyEvent.VK_O);
+        JMenuItem exitItem = new JMenuItem(BUNDLE.getString("popup.exit"), KeyEvent.VK_E);
         openItem.addActionListener(e -> SwingUtilities.invokeLater(Main::openEditorGui));
         exitItem.addActionListener(e -> SwingUtilities.invokeLater(Main::onShutdown));
         popupMenu.add(openItem);
@@ -134,7 +135,10 @@ public class Main {
                 buildTrayIcon();
             });
         } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, text("errors.cannotSave", e), text("errors.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    BUNDLE.getString("errors.cannotSave").formatted(e),
+                    BUNDLE.getString("errors.title"),
+                    JOptionPane.ERROR_MESSAGE);
             e.printStackTrace();
         }
     }
@@ -170,11 +174,13 @@ public class Main {
     public static final Image IMAGE_ICON;
     public static final ImageIcon ICON;
 
-    public static final String[] MESSAGES = Objects.requireNonNull(getArray("messages"), "Messages are missing??");
+    public static final String[] MESSAGES = Objects.requireNonNull(
+            BUNDLE.getString("messages").split("\\|"),
+            "Messages are missing??");
 
     static {
         try {
-            IMAGE_ICON = ImageIO.read(Objects.requireNonNull(Main.class.getResourceAsStream("/icon.png")));
+            IMAGE_ICON = ImageIO.read(Objects.requireNonNull(BaseDialog.class.getResourceAsStream("icon.png")));
             ICON = new ImageIcon(IMAGE_ICON.getScaledInstance(32, 32, Image.SCALE_DEFAULT));
         } catch (IOException | NullPointerException e) {
             throw new RuntimeException("Cannot read birthday icon!");
@@ -186,23 +192,23 @@ public class Main {
         Clip clip = playSound(birthday);
         String labelContent;
         if (daysApart == 0) {
-            labelContent = text("notify.content",
+            labelContent = BUNDLE.getString("notify.content").formatted(
                     birthday.name,
                     BirthdaysManager.getAgeInYears(birthday),
                     birthday.customMessage != null
                             ? birthday.customMessage
                             : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
         } else if (daysApart == 1) {
-            labelContent = text("notify.late.content.yesterday",
+            labelContent = BUNDLE.getString("notify.late.content.yesterday").formatted(
                     birthday.name,
                     BirthdaysManager.getAgeInYears(birthday));
         } else {
-            labelContent = text("notify.late.content.more",
+            labelContent = BUNDLE.getString("notify.late.content.more").formatted(
                     birthday.name,
                     daysApart,
                     BirthdaysManager.getAgeInYears(birthday));
         }
-        String title = text("notify.title", birthday.name);
+        String title = BUNDLE.getString("notify.title").formatted(birthday.name);
         JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
         JDialog dialog = optionPane.createDialog(title);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -245,9 +251,9 @@ public class Main {
 
         long daysBeforeBirthday = BirthdaysManager.getDaysBeforeBirthday(birthday);
         String text = daysBeforeBirthday > 1
-                ? text("notify.before.text.more", birthday.name, daysBeforeBirthday)
-                : text("notify.before.text.tomorrow", birthday.name);
-        displayMessage(text("notify.before.caption"), text);
+                ? BUNDLE.getString("notify.before.text.more").formatted(birthday.name, daysBeforeBirthday)
+                : BUNDLE.getString("notify.before.text.tomorrow").formatted(birthday.name);
+        displayMessage(BUNDLE.getString("notify.before.caption"), text);
     }
 
     private static void displayMessage(String caption, String text) {

@@ -14,7 +14,7 @@
 
         <spacer weight="1" />
 
-        <button name="aboutButton" text="about.header" />
+        <button name="aboutButton" text="about.button" />
         <button name="closeButton" text="dialog.close" />
     </row-panel>
 </column-panel>

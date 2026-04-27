@@ -4,7 +4,7 @@
 
 <column-panel padding="8" spacing="4">
     <row-panel spacing="4" weight="1" >
-        <image-pane scaleMode="fill-height" image="/icon.png" padding="8" />
+        <image-pane scaleMode="fill-height" image="icon.png" padding="8" />
         <column-panel spacing="4" weight="1">
             <label name="header" text="about.header" />
             <scroll-pane name="contentScrollPane" weight="1" />

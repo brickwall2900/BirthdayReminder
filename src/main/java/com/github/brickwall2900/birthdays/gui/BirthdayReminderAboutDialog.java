@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.BundleMultiplexer;
 import com.github.brickwall2900.birthdays.LicenseManager;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
@@ -9,26 +10,29 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
+import java.util.ResourceBundle;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
-import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class BirthdayReminderAboutDialog extends JDialog {
-    public static final String TITLE = text("about.title");
+    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayReminderAboutDialog.class.getName()),
+            BaseDialog.BUNDLE
+    );
+    public static final String TITLE = BUNDLE.getString("about.title");
     public static final Dimension SIZE = new Dimension(600, 230);
 
     public BirthdayReminderAboutDialog(Window owner) {
         super(owner);
 
-        setContentPane(UILoader.load(this, "/ui/about.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "about.xml", BUNDLE));
 
         darkModeCheckbox.setSelected(BirthdayNotifierConfig.applicationConfig.darkMode);
         header.setFont(header.getFont().deriveFont(Font.BOLD, 18));
 
         contentScrollPane.setViewportView(contentPane = new JTextPane());
         contentPane.setContentType("text/html");
-        contentPane.setText(text("about.content", Main.getVersion()));
+        contentPane.setText(BUNDLE.getString("about.content").formatted(Main.getVersion()));
         contentPane.setEditable(false);
         contentPane.setBorder(null);
         contentScrollPane.setBorder(null);

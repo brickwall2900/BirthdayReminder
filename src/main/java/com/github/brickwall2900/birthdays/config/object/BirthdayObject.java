@@ -6,7 +6,6 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class BirthdayObject {
     public static final DateTimeFormatter DATE_TO_STING_FORMATTER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
@@ -38,7 +37,7 @@ public class BirthdayObject {
 
     @Override
     public String toString() {
-        return String.format(text("editor.object"),
+        return String.format("%s, at %s; %d days left, %d y/o",
                 name,
                 date.format(DATE_TO_STING_FORMATTER),
                 BirthdaysManager.getDaysBeforeBirthday(this),

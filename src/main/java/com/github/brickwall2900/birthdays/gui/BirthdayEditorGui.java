@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.BundleMultiplexer;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
@@ -16,16 +17,17 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.format.FormatStyle;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
-import java.util.Objects;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
-import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
+    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayEditorGui.class.getName()),
+            BaseDialog.BUNDLE
+    );
+
     public static final Dimension SIZE = new Dimension(450, 270);
     public static final int FORM_INSETS = 2;
 
@@ -52,9 +54,9 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
     private BirthdayObject birthday;
 
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
-        super(parent, text("editor.dialog.title", "???"));
+        super(parent, BUNDLE.getString("editor.dialog.title").formatted("???"));
 
-        setContentPane(UILoader.load(this, "/ui/birthdayEditor.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "birthdayEditor.xml", BUNDLE));
         initForm();
 
         enabledCheckBox.setSelected(true);
@@ -64,11 +66,11 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         removeOverrideConfigButton.addActionListener(this::onRemoveOverrideConfigButtonPressed);
         removeOverrideConfigButton.setEnabled(false);
 
-        nameField.setToolTipText(text("editor.dialog.fields.name.tip"));
-        datePicker.setToolTipText(text("editor.dialog.fields.date.tip", DATES_PATTERNS));
-        enabledCheckBox.setToolTipText(text("editor.dialog.fields.enabled.tip"));
-        customMessageField.setToolTipText(text("editor.dialog.fields.customMessage.tip"));
-        overrideConfigButton.setToolTipText(text("editor.dialog.fields.override.tip"));
+        nameField.setToolTipText(BUNDLE.getString("editor.dialog.fields.name.tip"));
+        datePicker.setToolTipText(BUNDLE.getString("editor.dialog.fields.date.tip").formatted(DATES_PATTERNS));
+        enabledCheckBox.setToolTipText(BUNDLE.getString("editor.dialog.fields.enabled.tip"));
+        customMessageField.setToolTipText(BUNDLE.getString("editor.dialog.fields.customMessage.tip"));
+        overrideConfigButton.setToolTipText(BUNDLE.getString("editor.dialog.fields.override.tip"));
 
         datePicker.setInputVerifier(new ProperInputVerifier());
 
@@ -84,13 +86,34 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
-        newField(text("editor.dialog.fields.name"), contentPane, nameField = new JTextField(), null, c);
-        newField(text("editor.dialog.fields.date"), contentPane, datePicker = new DatePicker(), null, c);
-        newField(text("editor.dialog.fields.enabled"), contentPane, enabledCheckBox = new JCheckBox(), null, c);
-        newField(text("editor.dialog.fields.customMessage"), contentPane, customMessageField = new JTextField(), null, c);
-        newField(text("editor.dialog.fields.override"), contentPane, overrideConfigButton = new JButton(), removeOverrideConfigButton = new JButton(), c);
-        overrideConfigButton.setText(text("dialog.edit"));
-        removeOverrideConfigButton.setText(text("dialog.remove"));
+        newField(BUNDLE.getString("editor.dialog.fields.name"),
+                contentPane,
+                nameField = new JTextField(),
+                null,
+                c);
+        newField(BUNDLE.getString("editor.dialog.fields.date"),
+                contentPane,
+                datePicker = new DatePicker(),
+                null,
+                c);
+        newField(BUNDLE.getString("editor.dialog.fields.enabled"),
+                contentPane,
+                enabledCheckBox = new JCheckBox(),
+                null,
+                c);
+        newField(BUNDLE.getString("editor.dialog.fields.customMessage"),
+                contentPane,
+                customMessageField = new JTextField(),
+                null,
+                c);
+        newField(BUNDLE.getString("editor.dialog.fields.override"),
+                contentPane,
+                overrideConfigButton = new JButton(),
+                removeOverrideConfigButton = new JButton(),
+                c);
+
+        overrideConfigButton.setText(BUNDLE.getString("dialog.edit"));
+        removeOverrideConfigButton.setText(BUNDLE.getString("dialog.remove"));
 
         formScrollPane.setViewportView(contentPane);
         formScrollPane.setBorder(null);
@@ -121,7 +144,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         this(parent);
         this.birthday = birthday;
 
-        setTitle(text("editor.dialog.title", birthday.name));
+        setTitle(BUNDLE.getString("editor.dialog.title").formatted(birthday.name));
         nameField.setText(birthday.name);
         datePicker.setDate(birthday.date); // set date internally
         datePicker.setText(dateFormatter.format(birthday.date)); // set date in text field

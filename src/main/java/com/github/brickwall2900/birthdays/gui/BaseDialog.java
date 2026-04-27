@@ -9,10 +9,10 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.Objects;
-
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
+import java.util.ResourceBundle;
 
 public abstract class BaseDialog<T> extends JDialog {
+    protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BaseDialog.class.getName());
     protected boolean canceled;
 
     private void init() {
@@ -50,7 +50,9 @@ public abstract class BaseDialog<T> extends JDialog {
 
     private void onEscapePressed(ActionEvent e) {
         int option = JOptionPane.showConfirmDialog(this,
-                text("dialog.save.confirm"), getTitle(), JOptionPane.YES_NO_CANCEL_OPTION);
+                BUNDLE.getString("dialog.save.confirm"),
+                getTitle(),
+                JOptionPane.YES_NO_CANCEL_OPTION);
         if (option == JOptionPane.YES_OPTION) {
             dispose();
         } else if (option == JOptionPane.NO_OPTION) {

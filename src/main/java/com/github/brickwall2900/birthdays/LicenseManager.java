@@ -10,12 +10,12 @@ import java.net.URL;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Iterator;
+import java.util.ResourceBundle;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
-
 public class LicenseManager {
+    private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(LicenseManager.class.getName());
     private static final String LICENSE_PATH_IN_JAR = "META-INF/licenses";
 
     public static void openLicense() {
@@ -24,21 +24,23 @@ public class LicenseManager {
             tempDir.toFile().deleteOnExit();
 
             Path dest = extractResourcesFromJar(tempDir, LICENSE_PATH_IN_JAR);
-            System.out.println(dest);
             Path index = dest.resolve("index.html");
-            System.out.println(index);
             Runtime.getRuntime().addShutdownHook(new Thread(() -> deleteOnExit(tempDir)));
 
             if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE)) {
                 Desktop.getDesktop().browse(index.toUri());
             } else {
-                JOptionPane.showMessageDialog(null, text("errors.license.desktop", index),
-                        text("errors.title"), JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        BUNDLE.getString("errors.license.desktop").formatted(index),
+                        BUNDLE.getString("errors.title"),
+                        JOptionPane.ERROR_MESSAGE);
             }
         } catch (IOException e) {
             e.printStackTrace();
-            JOptionPane.showMessageDialog(null, text("errors.license", e),
-                    text("errors.title"), JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    BUNDLE.getString("errors.license").formatted(e),
+                    BUNDLE.getString("errors.title"),
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -48,7 +50,6 @@ public class LicenseManager {
                 @Override
                 public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
                     Files.delete(file);
-                    System.out.println("Deleted file " + file);
                     return FileVisitResult.CONTINUE;
                 }
 
@@ -56,7 +57,6 @@ public class LicenseManager {
                 public FileVisitResult postVisitDirectory(Path directory, IOException exc) throws IOException {
                     if (!directory.equals(path)) {
                         Files.delete(directory);
-                        System.out.println("Deleted directory " + directory);
                     }
                     return FileVisitResult.CONTINUE;
                 }

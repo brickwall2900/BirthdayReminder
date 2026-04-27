@@ -1,5 +1,6 @@
 package com.github.brickwall2900.birthdays.gui;
 
+import com.github.brickwall2900.birthdays.BundleMultiplexer;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import org.httprpc.sierra.UILoader;
@@ -11,20 +12,24 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.io.File;
 import java.util.Locale;
+import java.util.ResourceBundle;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
-import static com.github.brickwall2900.birthdays.TranslatableText.BUNDLE;
-import static com.github.brickwall2900.birthdays.TranslatableText.text;
 
 public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig.Config> {
-    public static final String TITLE = text("notify.editor.dialog.title");
+    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayNotifierEditorGui.class.getName()),
+            BaseDialog.BUNDLE
+    );
+
+    public static final String TITLE = BUNDLE.getString("notify.editor.dialog.title");
     public static final Dimension SIZE = new Dimension(450, 180);
     public static final int FORM_INSETS = 2;
 
     public BirthdayNotifierEditorGui(Window owner) {
         super(owner, TITLE);
 
-        setContentPane(UILoader.load(this, "/ui/birthdayNotifyEdit.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "birthdayNotifyEdit.xml", BUNDLE));
         initForm();
 
         daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 0, 30, 1));
@@ -32,8 +37,8 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         cancelButton.addActionListener(this::onCancelButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
-        daysBeforeReminderSpinner.setToolTipText(text("notify.editor.dialog.daysBeforeReminder.tip"));
-        birthdaySoundPath.setToolTipText(text("notify.editor.dialog.birthdaySound.tip"));
+        daysBeforeReminderSpinner.setToolTipText(BUNDLE.getString("notify.editor.dialog.daysBeforeReminder.tip"));
+        birthdaySoundPath.setToolTipText(BUNDLE.getString("notify.editor.dialog.birthdaySound.tip"));
 
         getRootPane().registerKeyboardAction(this::onEscapePressed,
                 KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0),
@@ -56,8 +61,16 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
-        newField(text("notify.editor.dialog.daysBeforeReminder"), contentPane, daysBeforeReminderSpinner = new JSpinner(), null, c);
-        newField(text("notify.editor.dialog.birthdaySoundLabel"), contentPane, birthdaySoundPath = new JTextField(), birthdaySoundChooserButton = new JButton(text("dialog.open")), c);
+        newField(BUNDLE.getString("notify.editor.dialog.daysBeforeReminder"),
+                contentPane,
+                daysBeforeReminderSpinner = new JSpinner(),
+                null,
+                c);
+        newField(BUNDLE.getString("notify.editor.dialog.birthdaySoundLabel"),
+                contentPane,
+                birthdaySoundPath = new JTextField(),
+                birthdaySoundChooserButton = new JButton(BUNDLE.getString("dialog.open")),
+                c);
 
         formScrollPane.setViewportView(contentPane);
         formScrollPane.setBorder(null);
@@ -65,7 +78,7 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
 
     private void onEscapePressed(ActionEvent e) {
         int option = JOptionPane.showConfirmDialog(this,
-                text("dialog.save.confirm"), TITLE, JOptionPane.YES_NO_CANCEL_OPTION);
+                BUNDLE.getString("dialog.save.confirm"), TITLE, JOptionPane.YES_NO_CANCEL_OPTION);
         if (option == JOptionPane.YES_OPTION) {
             dispose();
         } else if (option == JOptionPane.NO_OPTION) {
@@ -128,7 +141,7 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
 
         @Override
         public String getDescription() {
-            return text("notify.editor.dialog.birthdaySound.fileType");
+            return BUNDLE.getString("notify.editor.dialog.birthdaySound.fileType");
         }
     }
 }
