@@ -68,8 +68,8 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
             // table debugging
             boolean tableDebugging = Boolean.getBoolean("table.debugging");
             return switch (columnIndex) {
-                case COL_NAMES -> object.name + (tableDebugging ? "[%d]".formatted(rowIndex) : "");
-                case COL_DATES -> object.date;
+                case COL_NAMES -> object.name() + (tableDebugging ? "[%d]".formatted(rowIndex) : "");
+                case COL_DATES -> object.date();
                 case COL_AGE -> BirthdaysManager.getAgeInYears(object);
                 case COL_DAYS -> BirthdaysManager.getDaysBeforeBirthday(object);
                 default -> BUNDLE.getString("editor.table.unknown");

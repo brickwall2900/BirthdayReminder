@@ -147,15 +147,15 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         this(parent);
         this.birthday = birthday;
 
-        setTitle(BUNDLE.getString("editor.dialog.title").formatted(birthday.name));
-        nameField.setText(birthday.name);
-        datePicker.setDate(birthday.date); // set date internally
-        datePicker.setText(dateFormatter.format(birthday.date)); // set date in text field
-        enabledCheckBox.setSelected(birthday.enabled);
-        customMessageField.setText(birthday.customMessage);
-        notifierOverride = birthday.override;
+        setTitle(BUNDLE.getString("editor.dialog.title").formatted(birthday.name()));
+        nameField.setText(birthday.name());
+        datePicker.setDate(birthday.date()); // set date internally
+        datePicker.setText(dateFormatter.format(birthday.date())); // set date in text field
+        enabledCheckBox.setSelected(birthday.enabled());
+        customMessageField.setText(birthday.customMessage());
+        notifierOverride = birthday.override();
 
-        removeOverrideConfigButton.setEnabled(birthday.override != null);
+        removeOverrideConfigButton.setEnabled(birthday.override() != null);
     }
 
     private void onOverrideConfigButtonPressed(ActionEvent e) {

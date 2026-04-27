@@ -191,22 +191,22 @@ public class Main {
         String labelContent;
         if (daysApart == 0) {
             labelContent = BUNDLE.getString("notify.content").formatted(
-                    birthday.name,
+                    birthday.name(),
                     BirthdaysManager.getAgeInYears(birthday),
-                    birthday.customMessage != null
-                            ? birthday.customMessage
+                    birthday.customMessage() != null
+                            ? birthday.customMessage()
                             : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
         } else if (daysApart == 1) {
             labelContent = BUNDLE.getString("notify.late.content.yesterday").formatted(
-                    birthday.name,
+                    birthday.name(),
                     BirthdaysManager.getAgeInYears(birthday));
         } else {
             labelContent = BUNDLE.getString("notify.late.content.more").formatted(
-                    birthday.name,
+                    birthday.name(),
                     daysApart,
                     BirthdaysManager.getAgeInYears(birthday));
         }
-        String title = BUNDLE.getString("notify.title").formatted(birthday.name);
+        String title = BUNDLE.getString("notify.title").formatted(birthday.name());
         JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
         JDialog dialog = optionPane.createDialog(title);
         dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
@@ -223,8 +223,8 @@ public class Main {
     }
 
     private static Clip playSound(BirthdayObject birthday) {
-        String soundLocation = birthday.override != null
-                ? birthday.override.birthdaySoundPath
+        String soundLocation = birthday.override() != null
+                ? birthday.override().birthdaySoundPath
                 : ConfigHolder.getNotifierConfig().birthdaySoundPath;
 
         if (soundLocation != null && !soundLocation.isBlank()) {
@@ -245,12 +245,12 @@ public class Main {
     }
 
     public static void remindBirthday(BirthdayObject birthday) {
-        if (!birthday.enabled) return;
+        if (!birthday.enabled()) return;
 
         long daysBeforeBirthday = BirthdaysManager.getDaysBeforeBirthday(birthday);
         String text = daysBeforeBirthday > 1
-                ? BUNDLE.getString("notify.before.text.more").formatted(birthday.name, daysBeforeBirthday)
-                : BUNDLE.getString("notify.before.text.tomorrow").formatted(birthday.name);
+                ? BUNDLE.getString("notify.before.text.more").formatted(birthday.name(), daysBeforeBirthday)
+                : BUNDLE.getString("notify.before.text.tomorrow").formatted(birthday.name());
         displayMessage(BUNDLE.getString("notify.before.caption"), text);
     }
 

@@ -123,7 +123,7 @@ public class BirthdayListEditorGui extends JFrame {
             int modelIndex = birthdayTable.convertRowIndexToModel(i);
             BirthdayObject object = tableModel.getBirthdayObjects().get(modelIndex);
 
-            if (object.name.toLowerCase().startsWith(tableKeyTyped)) {
+            if (object.name().toLowerCase().startsWith(tableKeyTyped)) {
                 birthdayTable.getSelectionModel().setSelectionInterval(i, i);
                 birthdayTable.scrollRectToVisible(birthdayTable.getCellRect(i, 0, true));
                 break;
@@ -158,7 +158,7 @@ public class BirthdayListEditorGui extends JFrame {
         BirthdayObject selected = getSelected();
         if (selected != null) {
             if (JOptionPane.showConfirmDialog(this,
-                    BUNDLE.getString("dialog.remove.confirm").formatted(selected.name),
+                    BUNDLE.getString("dialog.remove.confirm").formatted(selected.name()),
                     BUNDLE.getString("dialog.remove"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 birthdayTable.clearSelection();

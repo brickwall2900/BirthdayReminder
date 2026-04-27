@@ -5,40 +5,26 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Objects;
 
-
-public class BirthdayObject {
+public record BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage,
+                             BirthdayNotifierConfig override) {
     public static final DateTimeFormatter DATE_TO_STING_FORMATTER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
-    public final String name;
-    public final boolean enabled;
-    public final LocalDate date;
-
-    public final String customMessage;
-
-    public final BirthdayNotifierConfig override;
 
     public BirthdayObject() {
-        this.name = "???";
-        this.enabled = true;
-        this.date = LocalDate.now();
-        this.customMessage = null;
-        this.override = null;
+        this("???", true, LocalDate.now(), null, null);
     }
 
-    public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage) {
-        this.name = name;
-        this.enabled = enabled;
-        this.date = date;
-        this.customMessage = customMessage;
-        this.override = null;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass()) return false;
+        BirthdayObject that = (BirthdayObject) o;
+        return enabled == that.enabled && Objects.equals(name, that.name) && Objects.equals(date, that.date) && Objects.equals(customMessage, that.customMessage) && Objects.equals(override, that.override);
     }
 
-    public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage, BirthdayNotifierConfig override) {
-        this.name = name;
-        this.enabled = enabled;
-        this.date = date;
-        this.customMessage = customMessage;
-        this.override = override;
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, enabled, date, customMessage, override);
     }
 
     @Override

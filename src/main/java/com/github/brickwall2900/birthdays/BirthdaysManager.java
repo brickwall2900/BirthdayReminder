@@ -30,7 +30,7 @@ public class BirthdaysManager {
     public static BirthdayObject[] getBirthdaysSince(LocalDate date) {
         List<BirthdayObject> birthdayList = ConfigHolder.getBirthdayList();
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
-                .filter(obj -> obj.enabled)
+                .filter(obj -> obj.enabled())
                 .filter(obj -> isBirthdaySince(obj, date))
                 .toList();
         return birthdaysToday.toArray(BirthdayObject[]::new);
@@ -40,15 +40,15 @@ public class BirthdaysManager {
         List<BirthdayObject> birthdayList = ConfigHolder.getBirthdayList();
         LocalDate day = LocalDate.now().plusDays(days);
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
-                .filter(obj -> obj.enabled)
-                .filter(obj -> isMonthAndDayMatching(obj.date, day))
+                .filter(obj -> obj.enabled())
+                .filter(obj -> isMonthAndDayMatching(obj.date(), day))
                 .toList();
         return birthdaysToday.toArray(BirthdayObject[]::new);
     }
 
     public static boolean shouldRemind(BirthdayObject birthday) {
-        int daysBeforeReminder = birthday.override != null
-                ? birthday.override.daysBeforeReminder
+        int daysBeforeReminder = birthday.override() != null
+                ? birthday.override().daysBeforeReminder
                 : ConfigHolder.getNotifierConfig().daysBeforeReminder;
 
         // Calculate days until the next birthday
@@ -61,7 +61,7 @@ public class BirthdaysManager {
     public static long getDaysBeforeBirthday(BirthdayObject birthday) {
         LocalDate today = LocalDate.now();
 
-        MonthDay birthMonthDay = MonthDay.from(birthday.date);
+        MonthDay birthMonthDay = MonthDay.from(birthday.date());
         int year = today.getYear();
 
         LocalDate birthdayThisYear = fixLeapYear(birthMonthDay, year);
@@ -82,7 +82,7 @@ public class BirthdaysManager {
 
     public static boolean isBirthdayToday(BirthdayObject birthday) {
         LocalDate day = LocalDate.now();
-        return isMonthAndDayMatching(birthday.date, day);
+        return isMonthAndDayMatching(birthday.date(), day);
     }
 
     /// this determines if a person’s birthday has occurred within a specific window of time
@@ -99,7 +99,7 @@ public class BirthdaysManager {
         // Check if the birthday was between [since, today]
         // So we iterate through the years from 'since' to 'today'
         for (int year = since.getYear(); year <= today.getYear(); year++) {
-            LocalDate occurrence = fixLeapYear(MonthDay.from(birthdayObject.date), year);
+            LocalDate occurrence = fixLeapYear(MonthDay.from(birthdayObject.date()), year);
 
             // Check if this specific occurrence falls within the [since, today] range
             if (!occurrence.isBefore(since) && !occurrence.isAfter(today)) {
@@ -113,7 +113,7 @@ public class BirthdaysManager {
     /// returns the number of days from today since the last birthday passed
     public static long getDaysSinceBirthday(BirthdayObject birthdayObject) {
         LocalDate today = LocalDate.now();
-        MonthDay birthMonthDay = MonthDay.from(birthdayObject.date);
+        MonthDay birthMonthDay = MonthDay.from(birthdayObject.date());
 
         // get this year's occurrence, adjusting for leap year if necessary
         int year = today.getYear();
@@ -145,7 +145,7 @@ public class BirthdaysManager {
     }
 
     public static Period getAge(BirthdayObject object) {
-        return Period.between(object.date, LocalDate.now());
+        return Period.between(object.date(), LocalDate.now());
     }
 
     public static boolean isMonthAndDayMatching(LocalDate date, LocalDate today) {
