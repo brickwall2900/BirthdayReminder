@@ -6,6 +6,7 @@ import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.MonthDay;
 import java.time.Period;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -60,13 +61,17 @@ public class BirthdaysManager {
 
     public static long getDaysBeforeBirthday(BirthdayObject birthday) {
         LocalDate today = LocalDate.now();
-        LocalDate birthdayThisYear = birthday.date.withYear(today.getYear());
+
+        MonthDay birthMonthDay = MonthDay.from(birthday.date);
+        int year = today.getYear();
+
+        LocalDate birthdayThisYear = fixLeapYear(birthMonthDay, year);
 
         // Check if the birthday has already occurred this year
         LocalDate nextBirthday;
         if (birthdayThisYear.isBefore(today) || birthdayThisYear.isEqual(today)) {
             // Next birthday is next year so we increment it by one
-            nextBirthday = birthdayThisYear.plusYears(1);
+            nextBirthday = fixLeapYear(birthMonthDay, year + 1);
         } else {
             // Next birthday is this year!!
             nextBirthday = birthdayThisYear;
@@ -81,50 +86,59 @@ public class BirthdaysManager {
         return isMonthAndDayMatching(birthday.date, day);
     }
 
-    public static boolean isBirthdaySince(BirthdayObject birthday, LocalDate since) {
+    /// this determines if a person’s birthday has occurred within a specific window of time
+    /// specifically, between a "start date" `since`, and today.
+    public static boolean isBirthdaySince(BirthdayObject birthdayObject, LocalDate since) {
         LocalDate today = LocalDate.now();
 
-        LocalDate birthdayThisYear = birthday.date.withYear(today.getYear());
-        LocalDate birthdayLastYear = birthday.date.withYear(today.getYear() - 1);
-
-        // Check if the birthday was between lastAlive and today
-        // birthdayThisYear < since AND birthdayThisYear > tomorrow
-        // is birthdayThisYear before tomorrow AND is birthdayThisYear after the given date?
-        if (birthdayThisYear.isAfter(since) && birthdayThisYear.isBefore(today.plusDays(1))) {
-            return true;
+        if (since.isAfter(today)) {
+            // no birthday happened in the future
+            // who are you? doctor strange?
+            return false;
         }
 
-        // Check if lastAlive is in a different year and birthday last year was between
-        // what the fuck
+        // Check if the birthday was between [since, today]
+        // So we iterate through the years from 'since' to 'today'
+        for (int year = since.getYear(); year <= today.getYear(); year++) {
+            LocalDate occurrence = fixLeapYear(MonthDay.from(birthdayObject.date), year);
 
-        // check if that year is older than today's year
-        // AND
-        // check if birthday last year is after the given date
-        // AND
-        // check if the birthday last year is before tomorrow (okay wait what the actual fuck)
-        return since.getYear() < today.getYear() &&
-                birthdayLastYear.isAfter(since) && birthdayLastYear.isBefore(today.plusDays(1));
+            // Check if this specific occurrence falls within the [since, today] range
+            if (!occurrence.isBefore(since) && !occurrence.isAfter(today)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    public static long getDaysSinceBirthday(BirthdayObject birthday) {
+    /// returns the number of days from today since the last birthday passed
+    public static long getDaysSinceBirthday(BirthdayObject birthdayObject) {
         LocalDate today = LocalDate.now();
+        MonthDay birthMonthDay = MonthDay.from(birthdayObject.date);
 
-        // Adjust the birthday to the most recent occurrence
-        // okay so that means put it to this year's birthday
-        LocalDate lastBirthday = birthday.date.withYear(today.getYear());
+        // get this year's occurrence, adjusting for leap year if necessary
+        int year = today.getYear();
+        LocalDate lastBirthday = fixLeapYear(birthMonthDay, year);
 
         // is the birthday this year after today? did it pass?
         if (lastBirthday.isAfter(today)) {
             // then use the birthday from the previous year
-            lastBirthday = lastBirthday.minusYears(1);
+            lastBirthday = fixLeapYear(birthMonthDay, year - 1);
         }
 
         // Calculate days passed since the last birthday
         return ChronoUnit.DAYS.between(lastBirthday, today);
     }
 
+    /// returns a copy of the internal birthday list as an array
     public static BirthdayObject[] getAllBirthdays() {
-        return BirthdaysConfig.BIRTHDAY_LIST.toArray(new BirthdayObject[0]);
+        return BirthdaysConfig.BIRTHDAY_LIST.toArray(BirthdayObject[]::new);
+    }
+
+    public static LocalDate fixLeapYear(MonthDay monthDay /* DAMN i didn't know this exists */, int year) {
+        return monthDay.isValidYear(year)
+                ? monthDay.atYear(year)
+                : LocalDate.of(year, 2, 28);
     }
 
     public static int getAgeInYears(BirthdayObject object) {
@@ -136,6 +150,6 @@ public class BirthdaysManager {
     }
 
     public static boolean isMonthAndDayMatching(LocalDate date, LocalDate today) {
-        return date.getMonth() == today.getMonth() && date.getDayOfMonth() == today.getDayOfMonth();
+        return fixLeapYear(MonthDay.from(date), today.getYear()).equals(today);
     }
 }
