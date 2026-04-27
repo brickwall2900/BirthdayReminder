@@ -113,33 +113,29 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
         private static int sortByName(Object obj, Object other) {
             if (obj instanceof String b1 && other instanceof String b2) {
                 return b1.compareTo(b2);
-            } else {
-                return 0;
             }
+            return 0;
         }
 
         private static int sortByDays(Object obj, Object other) {
             if (obj instanceof Long days && other instanceof Long otherDays) {
                 return Long.compare(days, otherDays);
-            } else {
-                return 0;
             }
+            return 0;
         }
 
         private static int sortByDate(Object obj, Object other) {
             if (obj instanceof LocalDate b1 && other instanceof LocalDate b2) {
                 return b1.compareTo(b2);
-            } else {
-                return 0;
             }
+            return 0;
         }
 
         private static int sortByAge(Object obj, Object other) {
             if (obj instanceof Integer b1 && other instanceof Integer b2) {
-                return b1.compareTo(b2);
-            } else {
-                return 0;
+                return Integer.compare(b1, b2);
             }
+            return 0;
         }
     }
 
