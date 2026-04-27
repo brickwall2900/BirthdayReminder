@@ -121,7 +121,6 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
     public JButton cancelButton, closeButton;
 
     private static class WavFileFilter extends FileFilter {
-
         @Override
         public boolean accept(File f) {
             return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".wav");
