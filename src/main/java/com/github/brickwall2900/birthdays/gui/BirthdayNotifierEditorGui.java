@@ -16,7 +16,7 @@ import java.util.ResourceBundle;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 
-public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig.Config> {
+public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig> {
     private static final ResourceBundle BUNDLE = new BundleMultiplexer(
             ResourceBundle.getBundle(BirthdayNotifierEditorGui.class.getName()),
             BaseDialog.BUNDLE
@@ -50,7 +50,7 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         setLocationRelativeTo(owner);
     }
 
-    public BirthdayNotifierEditorGui(Window owner, BirthdayNotifierConfig.Config config) {
+    public BirthdayNotifierEditorGui(Window owner, BirthdayNotifierConfig config) {
         this(owner);
 
         daysBeforeReminderSpinner.setValue(config.daysBeforeReminder);
@@ -104,13 +104,13 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         }
     }
 
-    public BirthdayNotifierConfig.Config getResult() {
+    public BirthdayNotifierConfig getResult() {
         if (canceled) {
             return null;
         }
         int daysBeforeReminder = (int) daysBeforeReminderSpinner.getValue();
         String birthdaySound = birthdaySoundPath.getText();
-        return new BirthdayNotifierConfig.Config(daysBeforeReminder, birthdaySound);
+        return new BirthdayNotifierConfig(daysBeforeReminder, birthdaySound);
     }
 
     void destroy() {

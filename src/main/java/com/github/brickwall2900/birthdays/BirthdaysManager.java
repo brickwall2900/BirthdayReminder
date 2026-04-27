@@ -1,8 +1,7 @@
 package com.github.brickwall2900.birthdays;
 
-import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.ConfigHolder;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
-import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -16,9 +15,9 @@ public class BirthdaysManager {
         try {
             // yo wtf
             // sure everything is in global state
-            BirthdayNotifierConfig.loadGlobalConfig();
-            BirthdayNotifierConfig.loadApplicationConfig();
-            BirthdaysConfig.load();
+            ConfigHolder.loadGlobalConfig();
+            ConfigHolder.loadApplicationConfig();
+            ConfigHolder.loadBirthdays();
         } catch (IOException e) {
             throw new IllegalStateException("Cannot load birthdays!", e);
         }
@@ -29,7 +28,7 @@ public class BirthdaysManager {
     }
 
     public static BirthdayObject[] getBirthdaysSince(LocalDate date) {
-        List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
+        List<BirthdayObject> birthdayList = ConfigHolder.BIRTHDAY_LIST;
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
                 .filter(obj -> obj.enabled)
                 .filter(obj -> isBirthdaySince(obj, date))
@@ -38,7 +37,7 @@ public class BirthdaysManager {
     }
 
     public static BirthdayObject[] getBirthdaysOffset(int days) {
-        List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
+        List<BirthdayObject> birthdayList = ConfigHolder.BIRTHDAY_LIST;
         LocalDate day = LocalDate.now().plusDays(days);
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
                 .filter(obj -> obj.enabled)
@@ -50,7 +49,7 @@ public class BirthdaysManager {
     public static boolean shouldRemind(BirthdayObject birthday) {
         int daysBeforeReminder = birthday.override != null
                 ? birthday.override.daysBeforeReminder
-                : BirthdayNotifierConfig.globalConfig.daysBeforeReminder;
+                : ConfigHolder.notifierConfig.daysBeforeReminder;
 
         // Calculate days until the next birthday
         long daysBeforeBirthday = getDaysBeforeBirthday(birthday);
@@ -132,7 +131,7 @@ public class BirthdaysManager {
 
     /// returns a copy of the internal birthday list as an array
     public static BirthdayObject[] getAllBirthdays() {
-        return BirthdaysConfig.BIRTHDAY_LIST.toArray(BirthdayObject[]::new);
+        return ConfigHolder.BIRTHDAY_LIST.toArray(BirthdayObject[]::new);
     }
 
     public static LocalDate fixLeapYear(MonthDay monthDay /* DAMN i didn't know this exists */, int year) {

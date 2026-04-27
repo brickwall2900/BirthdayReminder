@@ -15,7 +15,7 @@ public class BirthdayObject {
 
     public String customMessage;
 
-    public BirthdayNotifierConfig.Config override;
+    public BirthdayNotifierConfig override;
 
     public BirthdayObject() {
     }
@@ -27,7 +27,7 @@ public class BirthdayObject {
         this.customMessage = customMessage;
     }
 
-    public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage, BirthdayNotifierConfig.Config override) {
+    public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage, BirthdayNotifierConfig override) {
         this.name = name;
         this.enabled = enabled;
         this.date = date;

@@ -3,7 +3,7 @@ package com.github.brickwall2900.birthdays.gui;
 import com.github.brickwall2900.birthdays.BundleMultiplexer;
 import com.github.brickwall2900.birthdays.LicenseManager;
 import com.github.brickwall2900.birthdays.Main;
-import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.ConfigHolder;
 import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
@@ -27,7 +27,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
 
         setContentPane(UILoader.load(this, "about.xml", BUNDLE));
 
-        darkModeCheckbox.setSelected(BirthdayNotifierConfig.applicationConfig.darkMode);
+        darkModeCheckbox.setSelected(ConfigHolder.applicationConfig.darkMode);
         header.setFont(header.getFont().deriveFont(Font.BOLD, 18));
 
         contentScrollPane.setViewportView(contentPane = new JTextPane());

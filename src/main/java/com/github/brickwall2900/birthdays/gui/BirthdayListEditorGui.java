@@ -3,6 +3,7 @@ package com.github.brickwall2900.birthdays.gui;
 import com.github.brickwall2900.birthdays.BundleMultiplexer;
 import com.github.brickwall2900.birthdays.Main;
 import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.ConfigHolder;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import org.httprpc.sierra.UILoader;
 
@@ -186,12 +187,12 @@ public class BirthdayListEditorGui extends JFrame {
     }
 
     private void onConfigButtonPressed(ActionEvent e) {
-        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, BirthdayNotifierConfig.globalConfig);
+        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, ConfigHolder.notifierConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
-        BirthdayNotifierConfig.Config config = notifierEditorGui.getResult();
+        BirthdayNotifierConfig config = notifierEditorGui.getResult();
         if (config != null) {
-            BirthdayNotifierConfig.globalConfig = config;
+            ConfigHolder.notifierConfig = config;
         }
         notifierEditorGui.destroy();
     }

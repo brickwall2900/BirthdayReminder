@@ -2,9 +2,8 @@ package com.github.brickwall2900.birthdays;
 
 import com.formdev.flatlaf.FlatDarkLaf;
 import com.formdev.flatlaf.FlatLightLaf;
-import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
+import com.github.brickwall2900.birthdays.config.ConfigHolder;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
-import com.github.brickwall2900.birthdays.config.object.BirthdaysConfig;
 import com.github.brickwall2900.birthdays.gui.BaseDialog;
 import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
 import dorkbox.systemTray.SystemTray;
@@ -42,7 +41,7 @@ public class Main {
         loadVersion();
 
         System.out.println("Version: " + version);
-        setDarkMode(BirthdayNotifierConfig.applicationConfig.darkMode);
+        setDarkMode(ConfigHolder.applicationConfig.darkMode);
 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.setDismissDelay(15 * 1000);
@@ -64,7 +63,7 @@ public class Main {
         updater.start();
 
         performChecks();
-        BirthdayNotifierConfig.applicationConfig.lastAlive = today;
+        ConfigHolder.applicationConfig.lastAlive = today;
     }
 
     private static void loadVersion() {
@@ -122,12 +121,12 @@ public class Main {
     public static void save() {
         try {
             if (editorGui != null) {
-                BirthdaysConfig.BIRTHDAY_LIST.clear();
-                BirthdaysConfig.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
+                ConfigHolder.BIRTHDAY_LIST.clear();
+                ConfigHolder.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
             }
-            BirthdaysConfig.save();
-            BirthdayNotifierConfig.saveGlobalConfig();
-            BirthdayNotifierConfig.saveApplicationConfig();
+            ConfigHolder.saveBirthdays();
+            ConfigHolder.saveGlobalConfig();
+            ConfigHolder.saveApplicationConfig();
 
             SwingUtilities.invokeLater(() -> {
                 editorGui.destroy();
@@ -149,13 +148,13 @@ public class Main {
         LocalDate today = LocalDate.now();
         if (!Main.today.equals(today)) { // day has changed, go update lol
             performChecks();
-            BirthdayNotifierConfig.applicationConfig.lastAlive = today;
+            ConfigHolder.applicationConfig.lastAlive = today;
             Main.today = today;
         }
     }
 
     public static void performChecks() {
-        LocalDate lastAlive = BirthdayNotifierConfig.applicationConfig.lastAlive;
+        LocalDate lastAlive = ConfigHolder.applicationConfig.lastAlive;
         BirthdayObject[] birthdaysToday = BirthdaysManager.getBirthdaysSince(lastAlive);
         BirthdayObject[] allBirthdays = BirthdaysManager.getAllBirthdays();
         // notify them
@@ -227,7 +226,7 @@ public class Main {
     private static Clip playSound(BirthdayObject birthday) {
         String soundLocation = birthday.override != null
                 ? birthday.override.birthdaySoundPath
-                : BirthdayNotifierConfig.globalConfig.birthdaySoundPath;
+                : ConfigHolder.notifierConfig.birthdaySoundPath;
 
         if (soundLocation != null && !soundLocation.isBlank()) {
             Path soundPath = Paths.get(soundLocation);
@@ -273,7 +272,7 @@ public class Main {
             FlatLightLaf.setup();
         }
         Arrays.stream(Window.getWindows()).forEach(SwingUtilities::updateComponentTreeUI);
-        BirthdayNotifierConfig.applicationConfig.darkMode = toggle;
+        ConfigHolder.applicationConfig.darkMode = toggle;
     }
 
     // ANYTHING to reduce memory usage ;-;
