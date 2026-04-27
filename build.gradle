@@ -1,4 +1,6 @@
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import com.github.jk1.license.filter.LicenseBundleNormalizer
+import com.github.jk1.license.render.InventoryHtmlReportRenderer
 
 plugins {
     id 'java'
@@ -33,8 +35,10 @@ tasks.register('fatJar', ShadowJar) {
     archiveClassifier.set('')
     archiveVersion.set(version.toString())
 
+    // normally i would specify this in the jar block or something
+    // but we're using an older version of gradle and this plugin
     manifest {
-        attributes 'Main-Class': 'com.github.brickwall2900.birthdays.Main'  // Set your main class
+        attributes 'Main-Class': 'com.github.brickwall2900.birthdays.Main'
     }
 
     from(sourceSets.main.output)
@@ -52,6 +56,20 @@ tasks.register('generateVersionInfo', JavaCompile) {
     }
 }
 
-processResources {
-    dependsOn generateVersionInfo
+licenseReport {
+    outputDir = "$projectDir/build/reports/dependency-license"
+    renderers = [new InventoryHtmlReportRenderer()]
+
+    configurations = ['runtimeClasspath']
+
+    filters = [new LicenseBundleNormalizer()]
+}
+
+tasks.named('processResources') {
+    dependsOn tasks.named('generateVersionInfo')
+    dependsOn tasks.named('generateLicenseReport')
+
+    from("$projectDir/build/reports/dependency-license") {
+        into 'META-INF/licenses'
+    }
 }
