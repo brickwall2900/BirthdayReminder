@@ -32,3 +32,13 @@ The executable JAR should be at `./build/libs/BirthReminder-<version>.jar`
 Currently, you need to manually set this application to auto-start 
 with your operating system. BirthdayReminder checks if it is someone's 
 birthday today when it is launched.
+
+---
+## Logo
+<img src="cake.png" alt="the editor">
+
+yes this is a wonderful logo i made in paint for 5 minutes at least this ain't AI generated!!
+
+it's supposed to be a little chocolate cake... i hope you like it
+
+<a href="https://github.com/brickwall2900/BirthdayReminder">BirthdayReminder Cake Image Icon</a> © 2026 by <a href="https://github.com/brickwall2900">brickwall2900</a> is licensed under <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a><img src="https://mirrors.creativecommons.org/presskit/icons/cc.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;"><img src="https://mirrors.creativecommons.org/presskit/icons/by.svg" alt="" style="max-width: 1em;max-height:1em;margin-left: .2em;">
