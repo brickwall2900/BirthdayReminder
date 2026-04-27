@@ -41,15 +41,8 @@ public class Main {
     private static void swingContext() {
         Thread.currentThread().setPriority(Thread.NORM_PRIORITY - 2);
         BirthdaysManager.loadEverything();
-        try (InputStream stream = Main.class.getResourceAsStream("/version.properties")) {
-            Properties versionProperties = new Properties();
-            versionProperties.load(stream);
-            version = versionProperties.getProperty("app.version");
-        } catch (IOException | NullPointerException e) {
-            System.err.println("Version cannot be retrieved!");
-            e.printStackTrace();
-            version = "Unknown";
-        }
+        loadVersion();
+
         System.out.println("Version: " + version);
         setDarkMode(BirthdayNotifierConfig.applicationConfig.darkMode);
 
@@ -71,6 +64,18 @@ public class Main {
 
         performChecks();
         BirthdayNotifierConfig.applicationConfig.lastAlive = today;
+    }
+
+    private static void loadVersion() {
+        try (InputStream stream = Main.class.getResourceAsStream("/version.properties")) {
+            Properties versionProperties = new Properties();
+            versionProperties.load(stream);
+            version = versionProperties.getProperty("app.version");
+        } catch (IOException | NullPointerException e) {
+            System.err.println("Version cannot be retrieved!");
+            e.printStackTrace();
+            version = "Unknown";
+        }
     }
 
     private static void onShutdown() {
@@ -265,6 +270,8 @@ public class Main {
         BirthdayNotifierConfig.applicationConfig.darkMode = toggle;
     }
 
+    // ANYTHING to reduce memory usage ;-;
+    // i would lwky put the charlie kirk picture here if i want to
     public static void destroyContainer(Container container) {
         if (container == null) return;
 
