@@ -13,11 +13,13 @@ import java.util.List;
 public class BirthdaysManager {
     public static void loadEverything() {
         try {
+            // yo wtf
+            // sure everything is in global state
             BirthdayNotifierConfig.loadGlobalConfig();
             BirthdayNotifierConfig.loadApplicationConfig();
             BirthdaysConfig.load();
         } catch (IOException e) {
-            throw new RuntimeException("Cannot load birthdays!", e);
+            throw new IllegalStateException("Cannot load birthdays!", e);
         }
     }
 
@@ -28,18 +30,20 @@ public class BirthdaysManager {
     public static BirthdayObject[] getBirthdaysSince(LocalDate date) {
         List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
-                .filter(obj -> obj.enabled && isBirthdaySince(obj, date))
+                .filter(obj -> obj.enabled)
+                .filter(obj -> isBirthdaySince(obj, date))
                 .toList();
-        return birthdaysToday.toArray(new BirthdayObject[0]);
+        return birthdaysToday.toArray(BirthdayObject[]::new);
     }
 
     public static BirthdayObject[] getBirthdaysOffset(int days) {
         List<BirthdayObject> birthdayList = BirthdaysConfig.BIRTHDAY_LIST;
         LocalDate day = LocalDate.now().plusDays(days);
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
-                .filter(obj -> obj.enabled && isMonthAndDayMatching(obj.date, day))
+                .filter(obj -> obj.enabled)
+                .filter(obj -> isMonthAndDayMatching(obj.date, day))
                 .toList();
-        return birthdaysToday.toArray(new BirthdayObject[0]);
+        return birthdaysToday.toArray(BirthdayObject[]::new);
     }
 
     public static boolean shouldRemind(BirthdayObject birthday) {
@@ -48,10 +52,10 @@ public class BirthdaysManager {
                 : BirthdayNotifierConfig.globalConfig.daysBeforeReminder;
 
         // Calculate days until the next birthday
-        long daysUntilBirthday = getDaysBeforeBirthday(birthday);
+        long daysBeforeBirthday = getDaysBeforeBirthday(birthday);
 
         // Determine if we should remind
-        return daysBeforeReminder != 0 && daysUntilBirthday <= daysBeforeReminder;
+        return daysBeforeReminder != 0 && daysBeforeBirthday <= daysBeforeReminder;
     }
 
     public static long getDaysBeforeBirthday(BirthdayObject birthday) {
@@ -61,11 +65,14 @@ public class BirthdaysManager {
         // Check if the birthday has already occurred this year
         LocalDate nextBirthday;
         if (birthdayThisYear.isBefore(today) || birthdayThisYear.isEqual(today)) {
-            nextBirthday = birthdayThisYear.plusYears(1); // Next birthday is next year
+            // Next birthday is next year so we increment it by one
+            nextBirthday = birthdayThisYear.plusYears(1);
         } else {
-            nextBirthday = birthdayThisYear; // Next birthday is this year
+            // Next birthday is this year!!
+            nextBirthday = birthdayThisYear;
         }
 
+        // and yes just count the days
         return ChronoUnit.DAYS.between(today, nextBirthday);
     }
 
@@ -81,11 +88,20 @@ public class BirthdaysManager {
         LocalDate birthdayLastYear = birthday.date.withYear(today.getYear() - 1);
 
         // Check if the birthday was between lastAlive and today
+        // birthdayThisYear < since AND birthdayThisYear > tomorrow
+        // is birthdayThisYear before tomorrow AND is birthdayThisYear after the given date?
         if (birthdayThisYear.isAfter(since) && birthdayThisYear.isBefore(today.plusDays(1))) {
             return true;
         }
 
         // Check if lastAlive is in a different year and birthday last year was between
+        // what the fuck
+
+        // check if that year is older than today's year
+        // AND
+        // check if birthday last year is after the given date
+        // AND
+        // check if the birthday last year is before tomorrow (okay wait what the actual fuck)
         return since.getYear() < today.getYear() &&
                 birthdayLastYear.isAfter(since) && birthdayLastYear.isBefore(today.plusDays(1));
     }
@@ -94,9 +110,13 @@ public class BirthdaysManager {
         LocalDate today = LocalDate.now();
 
         // Adjust the birthday to the most recent occurrence
+        // okay so that means put it to this year's birthday
         LocalDate lastBirthday = birthday.date.withYear(today.getYear());
+
+        // is the birthday this year after today? did it pass?
         if (lastBirthday.isAfter(today)) {
-            lastBirthday = lastBirthday.minusYears(1); // Use the birthday from the previous year
+            // then use the birthday from the previous year
+            lastBirthday = lastBirthday.minusYears(1);
         }
 
         // Calculate days passed since the last birthday
