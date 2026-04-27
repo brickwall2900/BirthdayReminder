@@ -27,7 +27,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
 
         setContentPane(UILoader.load(this, "about.xml", BUNDLE));
 
-        darkModeCheckbox.setSelected(ConfigHolder.applicationConfig.darkMode);
+        darkModeCheckbox.setSelected(ConfigHolder.getApplicationConfig().darkMode);
         header.setFont(header.getFont().deriveFont(Font.BOLD, 18));
 
         contentScrollPane.setViewportView(contentPane = new JTextPane());

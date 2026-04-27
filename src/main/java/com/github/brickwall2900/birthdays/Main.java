@@ -41,7 +41,7 @@ public class Main {
         loadVersion();
 
         System.out.println("Version: " + version);
-        setDarkMode(ConfigHolder.applicationConfig.darkMode);
+        setDarkMode(ConfigHolder.getApplicationConfig().darkMode);
 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
         toolTipManager.setDismissDelay(15 * 1000);
@@ -63,7 +63,7 @@ public class Main {
         updater.start();
 
         performChecks();
-        ConfigHolder.applicationConfig.lastAlive = today;
+        ConfigHolder.getApplicationConfig().lastAlive = today;
     }
 
     private static void loadVersion() {
@@ -121,8 +121,7 @@ public class Main {
     public static void save() {
         try {
             if (editorGui != null) {
-                ConfigHolder.BIRTHDAY_LIST.clear();
-                ConfigHolder.BIRTHDAY_LIST.addAll(List.of(editorGui.getBirthdays()));
+                ConfigHolder.setBirthdayList(List.of(editorGui.getBirthdays()));
             }
             ConfigHolder.saveBirthdays();
             ConfigHolder.saveGlobalConfig();
@@ -148,13 +147,13 @@ public class Main {
         LocalDate today = LocalDate.now();
         if (!Main.today.equals(today)) { // day has changed, go update lol
             performChecks();
-            ConfigHolder.applicationConfig.lastAlive = today;
+            ConfigHolder.getApplicationConfig().lastAlive = today;
             Main.today = today;
         }
     }
 
     public static void performChecks() {
-        LocalDate lastAlive = ConfigHolder.applicationConfig.lastAlive;
+        LocalDate lastAlive = ConfigHolder.getApplicationConfig().lastAlive;
         BirthdayObject[] birthdaysToday = BirthdaysManager.getBirthdaysSince(lastAlive);
         BirthdayObject[] allBirthdays = BirthdaysManager.getAllBirthdays();
         // notify them
@@ -226,7 +225,7 @@ public class Main {
     private static Clip playSound(BirthdayObject birthday) {
         String soundLocation = birthday.override != null
                 ? birthday.override.birthdaySoundPath
-                : ConfigHolder.notifierConfig.birthdaySoundPath;
+                : ConfigHolder.getNotifierConfig().birthdaySoundPath;
 
         if (soundLocation != null && !soundLocation.isBlank()) {
             Path soundPath = Paths.get(soundLocation);
@@ -272,7 +271,7 @@ public class Main {
             FlatLightLaf.setup();
         }
         Arrays.stream(Window.getWindows()).forEach(SwingUtilities::updateComponentTreeUI);
-        ConfigHolder.applicationConfig.darkMode = toggle;
+        ConfigHolder.getApplicationConfig().darkMode = toggle;
     }
 
     // ANYTHING to reduce memory usage ;-;

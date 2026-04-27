@@ -53,6 +53,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
     }
 
     private BirthdayObject birthday;
+    private BirthdayNotifierConfig notifierOverride;
 
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
         super(parent, BUNDLE.getString("editor.dialog.title").formatted("???"));
@@ -76,6 +77,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         datePicker.setInputVerifier(new ProperInputVerifier());
 
         this.birthday = new BirthdayObject();
+        this.notifierOverride = null;
 
         setIconImage(IMAGE_ICON);
         setSize(SIZE);
@@ -151,25 +153,27 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         datePicker.setText(dateFormatter.format(birthday.date)); // set date in text field
         enabledCheckBox.setSelected(birthday.enabled);
         customMessageField.setText(birthday.customMessage);
+        notifierOverride = birthday.override;
 
         removeOverrideConfigButton.setEnabled(birthday.override != null);
     }
 
     private void onOverrideConfigButtonPressed(ActionEvent e) {
-        BirthdayNotifierConfig defaultConfig = ConfigHolder.notifierConfig;
-        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, birthday.override != null ? birthday.override : defaultConfig);
+        BirthdayNotifierConfig defaultConfig = ConfigHolder.getNotifierConfig();
+        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this,
+                notifierOverride != null ? notifierOverride : defaultConfig);
         notifierEditorGui.setVisible(true);
         // wait for user
         BirthdayNotifierConfig modifiedConfig = notifierEditorGui.getResult();
         if (modifiedConfig != null) {
-            birthday.override = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
+            notifierOverride = !defaultConfig.equals(modifiedConfig) ? modifiedConfig : null;
         }
-        removeOverrideConfigButton.setEnabled(birthday.override != null);
+        removeOverrideConfigButton.setEnabled(notifierOverride != null);
         notifierEditorGui.destroy();
     }
 
     private void onRemoveOverrideConfigButtonPressed(ActionEvent e) {
-        birthday.override = null;
+        notifierOverride = null;
         removeOverrideConfigButton.setEnabled(false);
     }
 
@@ -183,7 +187,11 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         boolean enabled = enabledCheckBox.isSelected();
         String customMessage = customMessageField.getText();
 
-        return birthday = new BirthdayObject(name, enabled, date, !customMessage.isBlank() ? customMessage : null, birthday.override);
+        return birthday = new BirthdayObject(name,
+                enabled,
+                date,
+                !customMessage.isBlank() ? customMessage : null,
+                notifierOverride);
     }
 
     void destroy() {
@@ -198,6 +206,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         cancelButton = null;
         closeButton = null;
         birthday = null;
+        notifierOverride = null;
         formScrollPane = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }

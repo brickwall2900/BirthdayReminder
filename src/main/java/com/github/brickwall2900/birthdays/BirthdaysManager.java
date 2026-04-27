@@ -28,7 +28,7 @@ public class BirthdaysManager {
     }
 
     public static BirthdayObject[] getBirthdaysSince(LocalDate date) {
-        List<BirthdayObject> birthdayList = ConfigHolder.BIRTHDAY_LIST;
+        List<BirthdayObject> birthdayList = ConfigHolder.getBirthdayList();
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
                 .filter(obj -> obj.enabled)
                 .filter(obj -> isBirthdaySince(obj, date))
@@ -37,7 +37,7 @@ public class BirthdaysManager {
     }
 
     public static BirthdayObject[] getBirthdaysOffset(int days) {
-        List<BirthdayObject> birthdayList = ConfigHolder.BIRTHDAY_LIST;
+        List<BirthdayObject> birthdayList = ConfigHolder.getBirthdayList();
         LocalDate day = LocalDate.now().plusDays(days);
         List<BirthdayObject> birthdaysToday = birthdayList.stream()
                 .filter(obj -> obj.enabled)
@@ -49,7 +49,7 @@ public class BirthdaysManager {
     public static boolean shouldRemind(BirthdayObject birthday) {
         int daysBeforeReminder = birthday.override != null
                 ? birthday.override.daysBeforeReminder
-                : ConfigHolder.notifierConfig.daysBeforeReminder;
+                : ConfigHolder.getNotifierConfig().daysBeforeReminder;
 
         // Calculate days until the next birthday
         long daysBeforeBirthday = getDaysBeforeBirthday(birthday);
@@ -131,7 +131,7 @@ public class BirthdaysManager {
 
     /// returns a copy of the internal birthday list as an array
     public static BirthdayObject[] getAllBirthdays() {
-        return ConfigHolder.BIRTHDAY_LIST.toArray(BirthdayObject[]::new);
+        return ConfigHolder.getBirthdayList().toArray(BirthdayObject[]::new);
     }
 
     public static LocalDate fixLeapYear(MonthDay monthDay /* DAMN i didn't know this exists */, int year) {

@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class ConfigHolder {
@@ -24,9 +25,9 @@ public class ConfigHolder {
 
     private static final Gson gson;
 
-    public static BirthdayNotifierConfig notifierConfig = new BirthdayNotifierConfig();
-    public static ApplicationConfig applicationConfig = new ApplicationConfig();
-    public static final List<BirthdayObject> BIRTHDAY_LIST = new ArrayList<>();
+    private static BirthdayNotifierConfig notifierConfig = new BirthdayNotifierConfig();
+    private static ApplicationConfig applicationConfig = new ApplicationConfig();
+    private static final List<BirthdayObject> BIRTHDAY_LIST = new ArrayList<>();
 
     static {
         if (!Files.exists(GLOBAL_PATH)) {
@@ -51,12 +52,12 @@ public class ConfigHolder {
         }
         try (BufferedReader reader = Files.newBufferedReader(NOTIFIER_CONFIG_PATH);
              JsonReader jsonReader = new JsonReader(reader)) {
-            notifierConfig = gson.fromJson(jsonReader, BirthdayNotifierConfig.class);
+            setNotifierConfig(gson.fromJson(jsonReader, BirthdayNotifierConfig.class));
         }
     }
 
     public static void saveGlobalConfig() throws IOException {
-        String output = gson.toJson(notifierConfig);
+        String output = gson.toJson(getNotifierConfig());
         Files.writeString(NOTIFIER_CONFIG_PATH, output);
     }
 
@@ -66,12 +67,12 @@ public class ConfigHolder {
         }
         try (BufferedReader reader = Files.newBufferedReader(APP_CONFIG_PATH);
              JsonReader jsonReader = new JsonReader(reader)) {
-            applicationConfig = gson.fromJson(jsonReader, ApplicationConfig.class);
+            setApplicationConfig(gson.fromJson(jsonReader, ApplicationConfig.class));
         }
     }
 
     public static void saveApplicationConfig() throws IOException {
-        String output = gson.toJson(applicationConfig);
+        String output = gson.toJson(getApplicationConfig());
         Files.writeString(APP_CONFIG_PATH, output);
     }
 
@@ -82,12 +83,38 @@ public class ConfigHolder {
         try (BufferedReader reader = Files.newBufferedReader(BIRTHDAYS_PATH);
              JsonReader jsonReader = new JsonReader(reader)) {
             BirthdayObject[] objects = gson.fromJson(jsonReader, BirthdayObject[].class);
-            BIRTHDAY_LIST.addAll(Arrays.asList(objects));
+            setBirthdayList(Arrays.asList(objects));
         }
     }
 
     public static void saveBirthdays() throws IOException {
-        String output = gson.toJson(BIRTHDAY_LIST.toArray(new BirthdayObject[0]));
+        String output = gson.toJson(getBirthdayList().toArray(new BirthdayObject[0]));
         Files.writeString(BIRTHDAYS_PATH, output); // prevent file cutoffs
+    }
+
+    public static BirthdayNotifierConfig getNotifierConfig() {
+        return notifierConfig;
+    }
+
+    public static void setNotifierConfig(BirthdayNotifierConfig notifierConfig) {
+        ConfigHolder.notifierConfig = notifierConfig;
+    }
+
+    public static ApplicationConfig getApplicationConfig() {
+        return applicationConfig;
+    }
+
+    public static void setApplicationConfig(ApplicationConfig applicationConfig) {
+        ConfigHolder.applicationConfig = applicationConfig;
+    }
+
+    /// returns an unmodifiable list of birthday objects
+    public static List<BirthdayObject> getBirthdayList() {
+        return Collections.unmodifiableList(BIRTHDAY_LIST);
+    }
+
+    public static void setBirthdayList(List<BirthdayObject> birthdayList) {
+        BIRTHDAY_LIST.clear();
+        BIRTHDAY_LIST.addAll(birthdayList);
     }
 }

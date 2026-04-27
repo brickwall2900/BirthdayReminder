@@ -9,15 +9,20 @@ import java.time.format.DateTimeFormatter;
 
 public class BirthdayObject {
     public static final DateTimeFormatter DATE_TO_STING_FORMATTER = DateTimeFormatter.ofPattern("MMMM dd, yyyy");
-    public String name;
-    public boolean enabled;
-    public LocalDate date;
+    public final String name;
+    public final boolean enabled;
+    public final LocalDate date;
 
-    public String customMessage;
+    public final String customMessage;
 
-    public BirthdayNotifierConfig override;
+    public final BirthdayNotifierConfig override;
 
     public BirthdayObject() {
+        this.name = "???";
+        this.enabled = true;
+        this.date = LocalDate.now();
+        this.customMessage = null;
+        this.override = null;
     }
 
     public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage) {
@@ -25,6 +30,7 @@ public class BirthdayObject {
         this.enabled = enabled;
         this.date = date;
         this.customMessage = customMessage;
+        this.override = null;
     }
 
     public BirthdayObject(String name, boolean enabled, LocalDate date, String customMessage, BirthdayNotifierConfig override) {

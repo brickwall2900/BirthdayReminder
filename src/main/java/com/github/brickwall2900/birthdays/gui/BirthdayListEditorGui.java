@@ -187,12 +187,12 @@ public class BirthdayListEditorGui extends JFrame {
     }
 
     private void onConfigButtonPressed(ActionEvent e) {
-        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, ConfigHolder.notifierConfig);
+        BirthdayNotifierEditorGui notifierEditorGui = new BirthdayNotifierEditorGui(this, ConfigHolder.getNotifierConfig());
         notifierEditorGui.setVisible(true);
         // wait for user
         BirthdayNotifierConfig config = notifierEditorGui.getResult();
         if (config != null) {
-            ConfigHolder.notifierConfig = config;
+            ConfigHolder.setNotifierConfig(config);
         }
         notifierEditorGui.destroy();
     }
