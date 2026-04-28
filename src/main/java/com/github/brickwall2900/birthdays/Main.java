@@ -6,7 +6,8 @@ import com.github.brickwall2900.birthdays.config.ConfigHolder;
 import com.github.brickwall2900.birthdays.config.object.BirthdayObject;
 import com.github.brickwall2900.birthdays.gui.BaseDialog;
 import com.github.brickwall2900.birthdays.gui.BirthdayListEditorGui;
-import dorkbox.systemTray.SystemTray;
+import com.github.brickwall2900.birthdays.systray.*;
+import com.github.brickwall2900.birthdays.systray.TrayIcon;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
@@ -31,7 +32,7 @@ public class Main {
     }
 
     private static BirthdayListEditorGui editorGui;
-    private static SystemTray systemTray;
+    private static TrayIcon systemTray;
     private static InstanceLock lock;
     private static String version;
 
@@ -83,34 +84,33 @@ public class Main {
         editorGui = null;
         lock.unlock();
         if (systemTray != null) {
-            systemTray.shutdown();
+            systemTray.destroy();
         }
         System.exit(0);
     }
 
-    private static JMenu popupMenu;
+    private static TrayMenu popupMenu;
 
     public static void buildTrayIcon() {
-        systemTray = SystemTray.get(UNIQUE_APP_ID);
+        TrayIconProvider provider = SystemTrayProvider.get();
+        systemTray = provider.create(UNIQUE_APP_ID);
         systemTray.setImage(IMAGE_ICON);
         systemTray.setTooltip(BUNDLE.getString("trayIcon.title"));
 
-        popupMenu = new JMenu();
-        JMenuItem openItem = new JMenuItem(BUNDLE.getString("popup.open"), KeyEvent.VK_O);
-        JMenuItem exitItem = new JMenuItem(BUNDLE.getString("popup.exit"), KeyEvent.VK_E);
-        openItem.addActionListener(e -> SwingUtilities.invokeLater(Main::openEditorGui));
-        exitItem.addActionListener(e -> SwingUtilities.invokeLater(Main::onShutdown));
+        popupMenu = provider.createMenu();
+        TrayMenuItem openItem = provider.createMenuItem(BUNDLE.getString("popup.open"), KeyEvent.VK_O);
+        TrayMenuItem exitItem = provider.createMenuItem(BUNDLE.getString("popup.exit"), KeyEvent.VK_E);
+        openItem.addCallback(() -> SwingUtilities.invokeLater(Main::openEditorGui));
+        exitItem.addCallback(() -> SwingUtilities.invokeLater(Main::onShutdown));
         popupMenu.add(openItem);
         popupMenu.add(exitItem);
-        systemTray.setMenu(popupMenu);
+        systemTray.setTrayMenu(popupMenu);
     }
 
     private static void openEditorGui() {
         if (systemTray != null) {
-            systemTray.shutdown();
+            systemTray.destroy();
             systemTray = null;
-            Main.destroyContainer(popupMenu);
-            Main.removeComponentListeners(popupMenu);
         }
         if (editorGui == null) {
             editorGui = new BirthdayListEditorGui(BirthdaysManager.getAllBirthdays());
