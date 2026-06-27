@@ -19,23 +19,21 @@ import java.util.ResourceBundle;
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 
 public class BirthdayListEditorGui extends JFrame {
-    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
-            ResourceBundle.getBundle(BirthdayListEditorGui.class.getName()),
-            BaseDialog.BUNDLE
-    );
-
-    public static final String TITLE = BUNDLE.getString("editor.title");
     public static final Dimension SIZE = new Dimension(640, 720);
     public static final int TABLE_SEARCH_TIME_MS = 500;
     private static List<? extends RowSorter.SortKey> lastSortKeys;
 
     private BirthdayObjectTableModel tableModel;
 
+    private ResourceBundle bundle = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayListEditorGui.class.getName()),
+            ResourceBundle.getBundle(BaseDialog.class.getName())
+    );
     private String tableKeyTyped;
     private long tableKeyTypedTimestamp;
 
     public BirthdayListEditorGui(BirthdayObject[] objects) {
-        setContentPane(UILoader.load(this, "birthdayList.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "birthdayList.xml", bundle));
 
         birthdayTable = new JTable();
         birthdayScrollPane.setViewportView(birthdayTable);
@@ -87,8 +85,8 @@ public class BirthdayListEditorGui extends JFrame {
         editButton.setEnabled(false);
 
         popupMenu = new JPopupMenu();
-        JMenuItem editMenuItem = new JMenuItem(BUNDLE.getString("dialog.edit"), KeyEvent.VK_E);
-        JMenuItem removeMenuItem = new JMenuItem(BUNDLE.getString("dialog.remove"), KeyEvent.VK_R);
+        JMenuItem editMenuItem = new JMenuItem(bundle.getString("dialog.edit"), KeyEvent.VK_E);
+        JMenuItem removeMenuItem = new JMenuItem(bundle.getString("dialog.remove"), KeyEvent.VK_R);
         editMenuItem.addActionListener(this::onEditButtonPressed);
         removeMenuItem.addActionListener(this::onRemoveButtonPressed);
         popupMenu.add(editMenuItem);
@@ -96,7 +94,7 @@ public class BirthdayListEditorGui extends JFrame {
         birthdayTable.setComponentPopupMenu(popupMenu);
 
         setIconImage(IMAGE_ICON);
-        setTitle(TITLE);
+        setTitle(bundle.getString("editor.title"));
         setSize(SIZE);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -159,8 +157,8 @@ public class BirthdayListEditorGui extends JFrame {
         BirthdayObject selected = getSelected();
         if (selected != null) {
             if (JOptionPane.showConfirmDialog(this,
-                    BUNDLE.getString("dialog.remove.confirm").formatted(selected.name()),
-                    BUNDLE.getString("dialog.remove"),
+                    bundle.getString("dialog.remove.confirm").formatted(selected.name()),
+                    bundle.getString("dialog.remove"),
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 birthdayTable.clearSelection();
                 tableModel.removeBirthday(selected);
@@ -228,6 +226,7 @@ public class BirthdayListEditorGui extends JFrame {
         aboutButton = null;
         tableModel.destroy();
         tableModel = null;
+        bundle = null;
     }
 
     public JPopupMenu popupMenu;

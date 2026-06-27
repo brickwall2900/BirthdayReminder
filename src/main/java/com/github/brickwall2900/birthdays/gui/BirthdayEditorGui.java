@@ -11,7 +11,6 @@ import org.httprpc.sierra.UILoader;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.time.chrono.Chronology;
 import java.time.format.DateTimeFormatter;
@@ -24,11 +23,6 @@ import java.util.List;
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 
 public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
-    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
-            ResourceBundle.getBundle(BirthdayEditorGui.class.getName()),
-            BaseDialog.BUNDLE
-    );
-
     public static final Dimension SIZE = new Dimension(450, 270);
     public static final int FORM_INSETS = 2;
 
@@ -52,13 +46,18 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         DATES_PATTERNS = stringBuilder.toString();
     }
 
+    private ResourceBundle bundle = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayEditorGui.class.getName()),
+            super.bundle
+    );
+
     private BirthdayObject birthday;
     private BirthdayNotifierConfig notifierOverride;
 
     public BirthdayEditorGui(BirthdayListEditorGui parent) {
-        super(parent, BUNDLE.getString("editor.dialog.title").formatted("???"));
+        super(parent);
 
-        setContentPane(UILoader.load(this, "birthdayEditor.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "birthdayEditor.xml", bundle));
         initForm();
 
         enabledCheckBox.setSelected(true);
@@ -68,17 +67,18 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         removeOverrideConfigButton.addActionListener(this::onRemoveOverrideConfigButtonPressed);
         removeOverrideConfigButton.setEnabled(false);
 
-        nameField.setToolTipText(BUNDLE.getString("editor.dialog.fields.name.tip"));
-        datePicker.setToolTipText(BUNDLE.getString("editor.dialog.fields.date.tip").formatted(DATES_PATTERNS));
-        enabledCheckBox.setToolTipText(BUNDLE.getString("editor.dialog.fields.enabled.tip"));
-        customMessageField.setToolTipText(BUNDLE.getString("editor.dialog.fields.customMessage.tip"));
-        overrideConfigButton.setToolTipText(BUNDLE.getString("editor.dialog.fields.override.tip"));
+        nameField.setToolTipText(bundle.getString("editor.dialog.fields.name.tip"));
+        datePicker.setToolTipText(bundle.getString("editor.dialog.fields.date.tip").formatted(DATES_PATTERNS));
+        enabledCheckBox.setToolTipText(bundle.getString("editor.dialog.fields.enabled.tip"));
+        customMessageField.setToolTipText(bundle.getString("editor.dialog.fields.customMessage.tip"));
+        overrideConfigButton.setToolTipText(bundle.getString("editor.dialog.fields.override.tip"));
 
         datePicker.setInputVerifier(new ProperInputVerifier());
 
         this.birthday = null;
         this.notifierOverride = null;
 
+        setTitle(bundle.getString("editor.dialog.title").formatted("???"));
         setIconImage(IMAGE_ICON);
         setSize(SIZE);
         setLocationRelativeTo(parent);
@@ -89,34 +89,34 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
-        newField(BUNDLE.getString("editor.dialog.fields.name"),
+        newField(bundle.getString("editor.dialog.fields.name"),
                 contentPane,
                 nameField = new JTextField(),
                 null,
                 c);
-        newField(BUNDLE.getString("editor.dialog.fields.date"),
+        newField(bundle.getString("editor.dialog.fields.date"),
                 contentPane,
                 datePicker = new DatePicker(),
                 null,
                 c);
-        newField(BUNDLE.getString("editor.dialog.fields.enabled"),
+        newField(bundle.getString("editor.dialog.fields.enabled"),
                 contentPane,
                 enabledCheckBox = new JCheckBox(),
                 null,
                 c);
-        newField(BUNDLE.getString("editor.dialog.fields.customMessage"),
+        newField(bundle.getString("editor.dialog.fields.customMessage"),
                 contentPane,
                 customMessageField = new JTextField(),
                 null,
                 c);
-        newField(BUNDLE.getString("editor.dialog.fields.override"),
+        newField(bundle.getString("editor.dialog.fields.override"),
                 contentPane,
                 overrideConfigButton = new JButton(),
                 removeOverrideConfigButton = new JButton(),
                 c);
 
-        overrideConfigButton.setText(BUNDLE.getString("dialog.edit"));
-        removeOverrideConfigButton.setText(BUNDLE.getString("dialog.remove"));
+        overrideConfigButton.setText(bundle.getString("dialog.edit"));
+        removeOverrideConfigButton.setText(bundle.getString("dialog.remove"));
 
         formScrollPane.setViewportView(contentPane);
         formScrollPane.setBorder(null);
@@ -147,7 +147,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         this(parent);
         this.birthday = birthday;
 
-        setTitle(BUNDLE.getString("editor.dialog.title").formatted(birthday.name()));
+        setTitle(bundle.getString("editor.dialog.title").formatted(birthday.name()));
         nameField.setText(birthday.name());
         datePicker.setDate(birthday.date()); // set date internally
         datePicker.setText(dateFormatter.format(birthday.date())); // set date in text field
@@ -204,9 +204,10 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         return !Objects.equals(birthday, makeBirthdayObject());
     }
 
-    void destroy() {
+    protected void destroy() {
         Main.destroyContainer(this);
         Main.destroyContainer(getContentPane());
+        bundle = null;
         nameField = null;
         datePicker = null;
         enabledCheckBox = null;
@@ -218,7 +219,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
         birthday = null;
         notifierOverride = null;
         formScrollPane = null;
-        getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+        super.destroy();
     }
 
     class ProperInputVerifier extends InputVerifier {

@@ -15,24 +15,24 @@ import java.util.ResourceBundle;
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 
 public class BirthdayReminderAboutDialog extends JDialog {
-    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
-            ResourceBundle.getBundle(BirthdayReminderAboutDialog.class.getName()),
-            BaseDialog.BUNDLE
-    );
-    public static final String TITLE = BUNDLE.getString("about.title");
     public static final Dimension SIZE = new Dimension(600, 230);
+
+    private ResourceBundle bundle = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayReminderAboutDialog.class.getName()),
+            ResourceBundle.getBundle(BaseDialog.class.getName())
+    );
 
     public BirthdayReminderAboutDialog(Window owner) {
         super(owner);
 
-        setContentPane(UILoader.load(this, "about.xml", BUNDLE));
+        setContentPane(UILoader.load(this, "about.xml", bundle));
 
         darkModeCheckbox.setSelected(ConfigHolder.getApplicationConfig().darkMode);
         header.setFont(header.getFont().deriveFont(Font.BOLD, 18));
 
         contentScrollPane.setViewportView(contentPane = new JTextPane());
         contentPane.setContentType("text/html");
-        contentPane.setText(BUNDLE.getString("about.content").formatted(Main.getVersion()));
+        contentPane.setText(bundle.getString("about.content").formatted(Main.getVersion()));
         contentPane.setEditable(false);
         contentPane.setBorder(null);
         contentScrollPane.setBorder(null);
@@ -46,7 +46,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
                 JComponent.WHEN_IN_FOCUSED_WINDOW);
 
         setIconImage(IMAGE_ICON);
-        setTitle(TITLE);
+        setTitle(bundle.getString("about.title"));
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -76,6 +76,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
         contentScrollPane = null;
         contentPane.setText(null);
         contentPane = null;
+        bundle = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 

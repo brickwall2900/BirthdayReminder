@@ -12,7 +12,7 @@ import java.util.Objects;
 import java.util.ResourceBundle;
 
 public abstract class BaseDialog<T> extends JDialog {
-    protected static final ResourceBundle BUNDLE = ResourceBundle.getBundle(BaseDialog.class.getName());
+    protected ResourceBundle bundle = ResourceBundle.getBundle(BaseDialog.class.getName());
     protected boolean canceled;
 
     private void init() {
@@ -30,18 +30,18 @@ public abstract class BaseDialog<T> extends JDialog {
         });
     }
 
-    public BaseDialog(Frame owner, String title) {
-        super(owner, title);
+    public BaseDialog(Frame owner) {
+        super(owner);
         init();
     }
 
-    public BaseDialog(Dialog owner, String title) {
-        super(owner, title);
+    public BaseDialog(Dialog owner) {
+        super(owner);
         init();
     }
 
-    public BaseDialog(Window owner, String title) {
-        super(owner, title);
+    public BaseDialog(Window owner) {
+        super(owner);
         init();
     }
 
@@ -52,7 +52,7 @@ public abstract class BaseDialog<T> extends JDialog {
     private void onEscapePressed(ActionEvent e) {
         if (isDirty()) {
             int option = JOptionPane.showConfirmDialog(this,
-                    BUNDLE.getString("dialog.save.confirm"),
+                    bundle.getString("dialog.save.confirm"),
                     getTitle(),
                     JOptionPane.YES_NO_CANCEL_OPTION);
             if (option == JOptionPane.YES_OPTION) {
@@ -93,5 +93,10 @@ public abstract class BaseDialog<T> extends JDialog {
         c.fill = GridBagConstraints.HORIZONTAL;
         c.weightx = 1;
         where.add(Objects.requireNonNullElseGet(feedbackComponent, Box::createHorizontalGlue), c); // WHAT THAT'S A THING??
+    }
+
+    protected void destroy() {
+        bundle = null;
+        getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
     }
 }

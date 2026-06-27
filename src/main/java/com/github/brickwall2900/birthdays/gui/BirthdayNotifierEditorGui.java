@@ -6,30 +6,27 @@ import com.github.brickwall2900.birthdays.config.BirthdayNotifierConfig;
 import org.httprpc.sierra.UILoader;
 
 import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
 import java.io.File;
-import java.util.Locale;
 import java.util.ResourceBundle;
 
 import static com.github.brickwall2900.birthdays.Main.IMAGE_ICON;
 
 public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig> {
-    private static final ResourceBundle BUNDLE = new BundleMultiplexer(
-            ResourceBundle.getBundle(BirthdayNotifierEditorGui.class.getName()),
-            BaseDialog.BUNDLE
-    );
-
-    public static final String TITLE = BUNDLE.getString("notify.editor.dialog.title");
     public static final Dimension SIZE = new Dimension(450, 180);
     public static final int FORM_INSETS = 2;
 
-    public BirthdayNotifierEditorGui(Window owner) {
-        super(owner, TITLE);
+    private ResourceBundle bundle = new BundleMultiplexer(
+            ResourceBundle.getBundle(BirthdayNotifierEditorGui.class.getName()),
+            super.bundle
+    );
 
-        setContentPane(UILoader.load(this, "birthdayNotifyEdit.xml", BUNDLE));
+    public BirthdayNotifierEditorGui(Window owner) {
+        super(owner);
+
+        setContentPane(UILoader.load(this, "birthdayNotifyEdit.xml", bundle));
         initForm();
 
         daysBeforeReminderSpinner.setModel(new SpinnerNumberModel(1, 0, 30, 1));
@@ -37,10 +34,11 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         cancelButton.addActionListener(this::onCancelButtonPressed);
         birthdaySoundChooserButton.addActionListener(this::onChooseButtonPressed);
 
-        daysBeforeReminderSpinner.setToolTipText(BUNDLE.getString("notify.editor.dialog.daysBeforeReminder.tip"));
-        birthdaySoundPath.setToolTipText(BUNDLE.getString("notify.editor.dialog.birthdaySound.tip"));
+        daysBeforeReminderSpinner.setToolTipText(bundle.getString("notify.editor.dialog.daysBeforeReminder.tip"));
+        birthdaySoundPath.setToolTipText(bundle.getString("notify.editor.dialog.birthdaySound.tip"));
 
         setIconImage(IMAGE_ICON);
+        setTitle(bundle.getString("notify.editor.dialog.title"));
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);
         setLocationRelativeTo(owner);
@@ -61,15 +59,15 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         JPanel contentPane = new JPanel(new GridBagLayout());
         GridBagConstraints c = new GridBagConstraints();
         c.insets = new Insets(FORM_INSETS, FORM_INSETS, FORM_INSETS, FORM_INSETS);
-        newField(BUNDLE.getString("notify.editor.dialog.daysBeforeReminder"),
+        newField(bundle.getString("notify.editor.dialog.daysBeforeReminder"),
                 contentPane,
                 daysBeforeReminderSpinner = new JSpinner(),
                 null,
                 c);
-        newField(BUNDLE.getString("notify.editor.dialog.birthdaySoundLabel"),
+        newField(bundle.getString("notify.editor.dialog.birthdaySoundLabel"),
                 contentPane,
                 birthdaySoundPath = new JTextField(),
-                birthdaySoundChooserButton = new JButton(BUNDLE.getString("dialog.open")),
+                birthdaySoundChooserButton = new JButton(bundle.getString("dialog.open")),
                 c);
 
         formScrollPane.setViewportView(contentPane);
@@ -80,7 +78,8 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         if (birthdaySoundChooser == null) {
             birthdaySoundChooser = new JFileChooser(System.getProperty("user.dir"));
             birthdaySoundChooser.setMultiSelectionEnabled(false);
-            birthdaySoundChooser.addChoosableFileFilter(new WavFileFilter());
+            birthdaySoundChooser.addChoosableFileFilter(new FileNameExtensionFilter(
+                    bundle.getString("notify.editor.dialog.birthdaySound.fileType"), "wav"));
             birthdaySoundChooser.setAcceptAllFileFilterUsed(true);
         }
 
@@ -112,7 +111,7 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         return configHashCode != NO_VALUE && makeConfig().hashCode() != configHashCode;
     }
 
-    void destroy() {
+    protected void destroy() {
         Main.destroyContainer(this);
         Main.destroyContainer(getContentPane());
         daysBeforeReminderSpinner = null;
@@ -122,7 +121,8 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
         cancelButton = null;
         closeButton = null;
         formScrollPane = null;
-        getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+        bundle = null;
+        super.destroy();
     }
 
     public JScrollPane formScrollPane;
@@ -131,16 +131,4 @@ public class BirthdayNotifierEditorGui extends BaseDialog<BirthdayNotifierConfig
     public JButton birthdaySoundChooserButton;
     public JFileChooser birthdaySoundChooser;
     public JButton cancelButton, closeButton;
-
-    private static class WavFileFilter extends FileFilter {
-        @Override
-        public boolean accept(File f) {
-            return f.isDirectory() || f.getName().toLowerCase(Locale.ROOT).endsWith(".wav");
-        }
-
-        @Override
-        public String getDescription() {
-            return BUNDLE.getString("notify.editor.dialog.birthdaySound.fileType");
-        }
-    }
 }
