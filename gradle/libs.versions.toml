@@ -1,5 +1,5 @@
 [versions]
-sierra = "4.5"
+sierra = "4.6.2"
 gson = "2.14.0"
 flatlaf = "3.7.1"
 systray = "4.4"
