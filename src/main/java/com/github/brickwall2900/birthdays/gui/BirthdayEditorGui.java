@@ -76,7 +76,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
 
         datePicker.setInputVerifier(new ProperInputVerifier());
 
-        this.birthday = new BirthdayObject();
+        this.birthday = null;
         this.notifierOverride = null;
 
         setIconImage(IMAGE_ICON);
@@ -192,7 +192,7 @@ public class BirthdayEditorGui extends BaseDialog<BirthdayObject> {
     }
 
     public BirthdayObject getResult() {
-        if (canceled || isDirty()) {
+        if (canceled || !isDirty()) {
             return null;
         }
 

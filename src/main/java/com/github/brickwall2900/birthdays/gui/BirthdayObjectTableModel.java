@@ -25,6 +25,7 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
 
     public void addBirthday(BirthdayObject birthday) {
         birthdayObjects.add(birthday);
+        fireTableDataChanged();
     }
 
     public BirthdayObject getBirthday(int index) {
@@ -33,6 +34,7 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
 
     public void setBirthday(int index, BirthdayObject birthday) {
         birthdayObjects.set(index, birthday);
+        fireTableRowsUpdated(index, index);
     }
 
     @Override
@@ -44,6 +46,7 @@ public class BirthdayObjectTableModel extends AbstractTableModel {
 
     public void removeBirthday(BirthdayObject birthday) {
         birthdayObjects.remove(birthday);
+        fireTableDataChanged();
     }
 
     public void setBirthdayObjects(List<BirthdayObject> objects) {

@@ -12,20 +12,23 @@ import com.github.brickwall2900.birthdays.systray.TrayIcon;
 import javax.imageio.ImageIO;
 import javax.sound.sampled.*;
 import javax.swing.*;
-import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.ResourceBundle;
 
 public class Main {
     private static final ResourceBundle BUNDLE = ResourceBundle.getBundle(Main.class.getName());
     protected static final String UNIQUE_APP_ID = "PlayerScripts_BirthdayManager0001";
+    public static final int TOOLTIP_DELAY = 15 * 1000;
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(Main::swingContext);
@@ -45,7 +48,7 @@ public class Main {
         setDarkMode(ConfigHolder.getApplicationConfig().darkMode);
 
         ToolTipManager toolTipManager = ToolTipManager.sharedInstance();
-        toolTipManager.setDismissDelay(15 * 1000);
+        toolTipManager.setDismissDelay(TOOLTIP_DELAY);
 
         lock = new InstanceLock(UNIQUE_APP_ID);
         if (!lock.lock()) {
@@ -121,7 +124,7 @@ public class Main {
     public static void save() {
         try {
             if (editorGui != null) {
-                ConfigHolder.setBirthdayList(List.of(editorGui.getBirthdays()));
+                ConfigHolder.setBirthdayList(editorGui.getBirthdays());
             }
             ConfigHolder.saveBirthdays();
             ConfigHolder.saveGlobalConfig();
@@ -131,6 +134,8 @@ public class Main {
                 editorGui.destroy();
                 editorGui = null;
                 buildTrayIcon();
+
+                System.gc();
             });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
@@ -316,6 +321,9 @@ public class Main {
         }
         for (InputMethodListener il : component.getInputMethodListeners()) {
             component.removeInputMethodListener(il);
+        }
+        for (PropertyChangeListener pl : component.getPropertyChangeListeners()) {
+            component.removePropertyChangeListener(pl);
         }
     }
 

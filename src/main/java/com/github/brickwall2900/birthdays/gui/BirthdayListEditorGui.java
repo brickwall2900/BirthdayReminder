@@ -26,6 +26,7 @@ public class BirthdayListEditorGui extends JFrame {
 
     public static final String TITLE = BUNDLE.getString("editor.title");
     public static final Dimension SIZE = new Dimension(640, 720);
+    public static final int TABLE_SEARCH_TIME_MS = 500;
     private static List<? extends RowSorter.SortKey> lastSortKeys;
 
     private BirthdayObjectTableModel tableModel;
@@ -113,13 +114,14 @@ public class BirthdayListEditorGui extends JFrame {
             return; // don’t interfere with editing
         }
 
-        if ((System.currentTimeMillis() - tableKeyTypedTimestamp) >= 500) {
+        if ((System.currentTimeMillis() - tableKeyTypedTimestamp) >= TABLE_SEARCH_TIME_MS) {
             tableKeyTyped = "";
         }
 
         tableKeyTyped += Character.toLowerCase(e.getKeyChar());
 
-        for (int i = 0; i < birthdayTable.getRowCount(); i++) {
+        int rowCount = birthdayTable.getRowCount();
+        for (int i = 0; i < rowCount; i++) {
             int modelIndex = birthdayTable.convertRowIndexToModel(i);
             BirthdayObject object = tableModel.getBirthdayObjects().get(modelIndex);
 
@@ -140,7 +142,6 @@ public class BirthdayListEditorGui extends JFrame {
         BirthdayObject object = editBox.getResult();
         if (object != null) {
             tableModel.addBirthday(object);
-            tableModel.fireTableDataChanged();
         }
         editBox.destroy();
     }
@@ -163,7 +164,6 @@ public class BirthdayListEditorGui extends JFrame {
                     JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION) {
                 birthdayTable.clearSelection();
                 tableModel.removeBirthday(selected);
-                tableModel.fireTableDataChanged();
             }
         }
     }
@@ -180,7 +180,6 @@ public class BirthdayListEditorGui extends JFrame {
             BirthdayObject object = editBox.getResult();
             if (object != null) {
                 tableModel.setBirthday(selectedRow, object);
-                tableModel.fireTableRowsUpdated(selectedRow, selectedRow);
             }
             editBox.destroy();
         }
@@ -209,8 +208,8 @@ public class BirthdayListEditorGui extends JFrame {
         dialog.destroy();
     }
 
-    public BirthdayObject[] getBirthdays() {
-        return tableModel.getBirthdayObjects().toArray(new BirthdayObject[0]);
+    public List<BirthdayObject> getBirthdays() {
+        return tableModel.getBirthdayObjects();
     }
 
     public void destroy() {

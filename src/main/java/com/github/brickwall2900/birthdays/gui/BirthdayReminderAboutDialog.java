@@ -49,6 +49,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
         setTitle(TITLE);
         setSize(SIZE);
         setModalityType(ModalityType.APPLICATION_MODAL);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(owner);
     }
 
