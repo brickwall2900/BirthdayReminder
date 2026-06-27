@@ -1,8 +1,6 @@
 package com.github.brickwall2900.birthdays;
 
-import java.util.Enumeration;
-import java.util.ResourceBundle;
-import java.util.Vector;
+import java.util.*;
 
 // is this approach better than the old system we had?
 
@@ -26,12 +24,16 @@ public class BundleMultiplexer extends ResourceBundle {
                 : null;
     }
 
+    private Set<String> keys = null;
+
     @Override
     public Enumeration<String> getKeys() {
         // haha ancient java apis go brrrr
-        Vector<String> vector = new Vector<>();
-        bundleA.getKeys().asIterator().forEachRemaining(vector::addElement);
-        bundleB.getKeys().asIterator().forEachRemaining(vector::addElement);
-        return vector.elements();
+        if (keys == null) {
+            keys = new HashSet<>();
+            bundleA.getKeys().asIterator().forEachRemaining(keys::add);
+            bundleB.getKeys().asIterator().forEachRemaining(keys::add);
+        }
+        return Collections.enumeration(keys);
     }
 }
