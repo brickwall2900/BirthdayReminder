@@ -1,0 +1,11 @@
+[versions]
+sierra = "4.5"
+gson = "2.14.0"
+flatlaf = "3.7.1"
+systray = "4.4"
+
+[libraries]
+sierra = { module = "org.httprpc:sierra", version.ref = "sierra" }
+gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
+flatlaf = { module = "com.formdev:flatlaf", version.ref = "flatlaf" }
+systray = { module = "com.dorkbox:SystemTray", version.ref = "systray" }
