@@ -22,10 +22,19 @@ On your terminal, execute these commands:
 2. `cd BirthdayReminder`
 3. `./gradlew build`
 
+To run:
+```shell
+./gradlew run
+```
+
 ..or open this project in an IDE as a Gradle project.
 
-If you want to create an executable JAR: `./gradlew fatJar`. 
-The executable JAR should be at `./build/libs/BirthReminder-<version>.jar` 
+If you want to create an executable distribution:
+```shell
+./gradlew assembleDist
+```
+
+The executable JAR should be at `./build/distributions/BirthReminder-<version>.jar` 
 
 ---
 ## Start on Computer Boot 🚀
