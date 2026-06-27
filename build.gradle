@@ -23,11 +23,24 @@ dependencies {
     implementation(libs.flatlaf)
 
     implementation(libs.systray)
-
 }
 
 test {
     useJUnitPlatform()
+}
+
+application {
+    mainClass = "com.github.brickwall2900.birthdays.Main"
+}
+
+distributions {
+    main {
+        contents {
+            into("licenses") {
+                from(generateLicenseReport)
+            }
+        }
+    }
 }
 
 tasks.register('generateVersionInfo', JavaCompile) {
@@ -41,7 +54,7 @@ tasks.register('generateVersionInfo', JavaCompile) {
 }
 
 licenseReport {
-    outputDir = "$projectDir/build/reports/dependency-license"
+    outputDir = layout.buildDirectory.dir("license")
     renderers = [new InventoryHtmlReportRenderer()]
 
     configurations = ['runtimeClasspath']
@@ -53,7 +66,7 @@ tasks.named('processResources') {
     dependsOn tasks.named('generateVersionInfo')
     dependsOn tasks.named('generateLicenseReport')
 
-    from("$projectDir/build/reports/dependency-license") {
+    from(generateLicenseReport) {
         into 'META-INF/licenses'
     }
 }
