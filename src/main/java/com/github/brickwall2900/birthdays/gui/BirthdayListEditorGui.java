@@ -227,6 +227,7 @@ public class BirthdayListEditorGui extends JFrame {
         tableModel.destroy();
         tableModel = null;
         bundle = null;
+        dispose();
     }
 
     public JPopupMenu popupMenu;

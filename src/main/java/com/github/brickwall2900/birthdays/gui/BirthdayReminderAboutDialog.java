@@ -78,6 +78,7 @@ public class BirthdayReminderAboutDialog extends JDialog {
         contentPane = null;
         bundle = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+        dispose();
     }
 
     public JLabel header;

@@ -98,5 +98,6 @@ public abstract class BaseDialog<T> extends JDialog {
     protected void destroy() {
         bundle = null;
         getRootPane().unregisterKeyboardAction(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0));
+        dispose();
     }
 }

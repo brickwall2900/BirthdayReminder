@@ -18,7 +18,6 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Objects;
@@ -135,7 +134,10 @@ public class Main {
                 editorGui = null;
                 buildTrayIcon();
 
+                long mem = Runtime.getRuntime().freeMemory();
                 System.gc();
+                long after = Runtime.getRuntime().freeMemory();
+                System.out.printf("cleaned %.2f MB%n", (after - mem) / 1024.0 / 1024.0);
             });
         } catch (Exception e) {
             JOptionPane.showMessageDialog(null,
@@ -191,40 +193,44 @@ public class Main {
     }
 
     public static void notifyBirthday(BirthdayObject birthday) {
-        long daysApart = BirthdaysManager.getDaysSinceBirthday(birthday);
-        Clip clip = playSound(birthday);
-        String labelContent;
-        if (daysApart == 0) {
-            labelContent = BUNDLE.getString("notify.content").formatted(
-                    birthday.name(),
-                    BirthdaysManager.getAgeInYears(birthday),
-                    birthday.customMessage() != null
-                            ? birthday.customMessage()
-                            : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
-        } else if (daysApart == 1) {
-            labelContent = BUNDLE.getString("notify.late.content.yesterday").formatted(
-                    birthday.name(),
-                    BirthdaysManager.getAgeInYears(birthday));
-        } else {
-            labelContent = BUNDLE.getString("notify.late.content.more").formatted(
-                    birthday.name(),
-                    daysApart,
-                    BirthdaysManager.getAgeInYears(birthday));
+        JDialog dialog = null;
+        try (Clip clip = playSound(birthday)) {
+            long daysApart = BirthdaysManager.getDaysSinceBirthday(birthday);
+            String labelContent;
+            if (daysApart == 0) {
+                labelContent = BUNDLE.getString("notify.content").formatted(
+                        birthday.name(),
+                        BirthdaysManager.getAgeInYears(birthday),
+                        birthday.customMessage() != null
+                                ? birthday.customMessage()
+                                : MESSAGES[(int) (Math.random() * MESSAGES.length)]);
+            } else if (daysApart == 1) {
+                labelContent = BUNDLE.getString("notify.late.content.yesterday").formatted(
+                        birthday.name(),
+                        BirthdaysManager.getAgeInYears(birthday));
+            } else {
+                labelContent = BUNDLE.getString("notify.late.content.more").formatted(
+                        birthday.name(),
+                        daysApart,
+                        BirthdaysManager.getAgeInYears(birthday));
+            }
+            String title = BUNDLE.getString("notify.title").formatted(birthday.name());
+            JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
+            dialog = optionPane.createDialog(title);
+            dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
+            dialog.setIconImage(IMAGE_ICON);
+            dialog.setAlwaysOnTop(true);
+            dialog.requestFocus();
+            dialog.setVisible(true);
+            // wait for user
+            if (clip != null) {
+                clip.stop();
+            }
+        } finally {
+            if (dialog != null) {
+                dialog.dispose();
+            }
         }
-        String title = BUNDLE.getString("notify.title").formatted(birthday.name());
-        JOptionPane optionPane = new JOptionPane(labelContent, JOptionPane.PLAIN_MESSAGE, JOptionPane.DEFAULT_OPTION, ICON);
-        JDialog dialog = optionPane.createDialog(title);
-        dialog.setModalityType(Dialog.ModalityType.APPLICATION_MODAL);
-        dialog.setIconImage(IMAGE_ICON);
-        dialog.setAlwaysOnTop(true);
-        dialog.setVisible(true);
-        dialog.requestFocus();
-        // wait for user
-        if (clip != null) {
-            clip.stop();
-            clip.close();
-        }
-        dialog.dispose();
     }
 
     private static Clip playSound(BirthdayObject birthday) {
@@ -233,7 +239,7 @@ public class Main {
                 : ConfigHolder.getNotifierConfig().birthdaySoundPath;
 
         if (soundLocation != null && !soundLocation.isBlank()) {
-            Path soundPath = Paths.get(soundLocation);
+            Path soundPath = Path.of(soundLocation);
             try {
                 DataLine.Info info = new DataLine.Info(Clip.class, null);
                 Clip clip = (Clip) AudioSystem.getLine(info);
@@ -291,6 +297,8 @@ public class Main {
                 destroyContainer((Container) component);
             }
         }
+        container.setLayout(null);
+        container.removeAll();
     }
 
     private static void removeComponentListeners(Component component) {
