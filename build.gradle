@@ -54,7 +54,6 @@ tasks.register('generateVersionInfo', JavaCompile) {
 }
 
 licenseReport {
-    outputDir = layout.buildDirectory.dir("license")
     renderers = [new InventoryHtmlReportRenderer()]
 
     configurations = ['runtimeClasspath']
